@@ -1,0 +1,31 @@
+plugins {
+    id 'java'
+}
+
+group 'testJboss'
+version '1.0'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+
+    // https://mvnrepository.com/artifact/org.drools/drools-templates
+    compile group: 'org.drools', name: 'drools-templates', version: '7.42.0.Final'
+
+// https://mvnrepository.com/artifact/org.drools/drools-core
+    compile group: 'org.drools', name: 'drools-core', version: '7.42.0.Final'
+
+    // https://mvnrepository.com/artifact/org.drools/drools-compiler
+    compile group: 'org.drools', name: 'drools-compiler', version: '7.42.0.Final'
+
+// https://mvnrepository.com/artifact/org.drools/drools-templates
+    compile group: 'org.drools', name: 'drools-templates', version: '7.42.0.Final'
+
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}

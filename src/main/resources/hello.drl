@@ -1,0 +1,11 @@
+
+global String topicLevel
+rule "Drools Introduction"
+when
+$droolsIntro : DroolsIntroduction( topic == "Drools" )
+then
+System.out.println($droolsIntro.introduceYourself() + ", topic level is " + getDefaultIfNull(topicLevel));
+end
+function String getDefaultIfNull(String topicLevel) {
+return topicLevel == null ? "Moderate" : topicLevel;
+}
