@@ -1,13 +1,15 @@
 
 //STEP 1. Import required packages
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-
 public class treeDatabase {
 
+    public treeDatabase() {
+        C3POData.getDataSource()
+    }
 
+    C3POData.g
+
+/*
     //  Database credentials
     static final String DB_URL = "jdbc:postgresql://192.168.0.105:5432/treeDatabase";
     static final String USER = "postgres";
@@ -28,6 +30,7 @@ public class treeDatabase {
         System.out.println("PostgreSQL JDBC Driver successfully connected");
         Connection connection = null;
 
+
         try {
             connection = DriverManager
                     .getConnection(DB_URL, USER, PASS);
@@ -44,4 +47,6 @@ public class treeDatabase {
             System.out.println("Failed to make connection to database");
         }
     }
+    */
+
 }
