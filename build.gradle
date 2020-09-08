@@ -12,6 +12,8 @@ repositories {
 }
 
 dependencies {
+// https://mvnrepository.com/artifact/org.postgresql/postgresql
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.16'
 
 
     // https://mvnrepository.com/artifact/org.drools/drools-templates

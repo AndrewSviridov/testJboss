@@ -1,12 +1,10 @@
 import org.kie.api.KieServices;
-import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.kie.internal.builder.DecisionTableConfiguration;
 import org.kie.internal.builder.DecisionTableInputType;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
-import org.kie.internal.io.ResourceFactory;
 
 /**
  * This is a sample class to launch a rule.
@@ -40,13 +38,13 @@ public class DroolsIntroduction {
             dtableconfiguration.setInputType(DecisionTableInputType.XLS);
 
             KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-
+/*
             kbuilder.add(ResourceFactory.newClassPathResource(getSpreadsheetName(),
                     getClass()),
                     ResourceType.DTABLE,
                     dtableconfiguration);
 
-
+*/
         } catch (Throwable t) {
             t.printStackTrace();
         }
