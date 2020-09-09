@@ -23,11 +23,11 @@ public class C3POData {
 
     static {
         try {
-            properties = new Properties();
-            properties.load(new FileInputStream("src/database.properties"));
+            properties = new Properties();//src/main/resources/config.properties
+            properties.load(new FileInputStream("src/main/resources/database.properties"));
             //private val cpds =
             dataSource = new ComboPooledDataSource();
-            dataSource.setDriverClass(properties.getProperty(DB_DRIVER_CLASS));
+            dataSource.setDriverClass("org.postgresql.Driver");
             dataSource.setJdbcUrl(properties.getProperty(DB_URL));
             dataSource.setUser(properties.getProperty(DB_USERNAME));
             dataSource.setPassword(properties.getProperty(DB_PASSWORD));

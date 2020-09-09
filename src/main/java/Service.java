@@ -1,12 +1,14 @@
-import java.util.Properties;
+import java.sql.SQLException;
+
 
 public class Service {
-    private static Properties property;
-
-    public static void main(String[] args) {
 
 
-        treeDatabase test = treeDatabase()
+    public static void main(String[] args) throws SQLException {
+
+
+        treeDatabase test = new treeDatabase(C3POData.getDataSource().getConnection());
+        test.getRule();
 
     }
 }
