@@ -3,12 +3,12 @@ package rule;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Condition {
+public class ConditionForWeka {
 
 
     private String field;
     private Object value;
-    private Condition.Operator operator;
+    private ConditionForWeka.Operator operator;
 
     public String getField() {
         return field;
@@ -26,11 +26,11 @@ public class Condition {
         this.value = value;
     }
 
-    public Condition.Operator getOperator() {
+    public ConditionForWeka.Operator getOperator() {
         return operator;
     }
 
-    public void setOperator(Condition.Operator operator) {
+    public void setOperator(ConditionForWeka.Operator operator) {
         this.operator = operator;
     }
 
@@ -71,7 +71,7 @@ public class Condition {
         private static Map<String, Operator> constants = new HashMap<String, Operator>();
 
         static {
-            for (Condition.Operator c : values()) {
+            for (Operator c : values()) {
                 constants.put(c.value, c);
             }
         }
@@ -86,8 +86,8 @@ public class Condition {
             return this.value;
         }
 
-        public static Condition.Operator fromValue(String value) {
-            Condition.Operator constant = constants.get(value);
+        public static Operator fromValue(String value) {
+            Operator constant = constants.get(value);
             if (constant == null) {
                 throw new IllegalArgumentException(value);
             } else {
@@ -95,6 +95,5 @@ public class Condition {
             }
         }
     }
-
 
 }
