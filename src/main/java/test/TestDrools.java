@@ -1,17 +1,111 @@
 package test;
 
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.dynamic.DynamicType;
+import net.bytebuddy.implementation.FixedValue;
+import net.bytebuddy.matcher.ElementMatchers;
 import org.kie.api.KieServices;
+import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
+import org.kie.api.io.Resource;
+import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.StatelessKieSession;
+import org.kie.internal.io.ResourceFactory;
+
+import java.io.Reader;
+import java.io.StringReader;
+
+import static net.bytebuddy.matcher.ElementMatchers.named;
 
 
 public class TestDrools {
-    public static void main(String[] args) {
-        KieServices ks = KieServices.Factory.get();
-        KieContainer kContainer = ks.getKieClasspathContainer();
-        KieSession kSession = kContainer.newKieSession();
+    public static void main(String[] args) throws IllegalAccessException, InstantiationException {
+
+        Class<?> dynamicType = new ByteBuddy();
+        dynamicType.asSubclass(Object.class);
+        dynamicType.getMethod(ElementMatchers.named("toString"))
+                .subclass(Object.class)
+                .method(ElementMatchers.named("toString"))
+                .intercept(FixedValue.value("Hello World!"))
+                .make()
+                .load(TestDrools.class.getClassLoader())
+                .getLoaded();
+
+
+        DynamicType.Unloaded unloadedType = new ByteBuddy()
+                .subclass(Object.class)
+                .method(ElementMatchers.isToString())
+                .intercept(FixedValue.value("Hello World ByteBuddy!"))
+                .make();
+
+        Class<?> dynamicType = unloadedType.load(TestDrools.class.getClassLoader()).getLoaded();
+
+        System.out.println(dynamicType.newInstance().toString());
+
+        String toString = new ByteBuddy()
+                .subclass(Object.class)
+                .name("example.Type")
+                .make()
+                .load(TestDrools.class.getClassLoader())
+                .getLoaded()
+                .newInstance() // Java reflection API
+                .toString();
+
+        System.out.println(toString);
+
+        String toString2 = new ByteBuddy()
+                .subclass(Object.class)
+                .name("example.Type")
+                .method(named("toString")).intercept(FixedValue.value("Hello World!"))
+                .make()
+                .load(TestDrools.class.getClassLoader())
+                .getLoaded()
+                .newInstance()
+                .toString();
+        System.out.println(toString2);
+
+/*
+        String r = new ByteBuddy()
+                .subclass(Foo.class)
+                .method(named("sayHelloFoo")
+                        .and(isDeclaredBy(Foo.class)
+                                .and(returns(String.class))))
+                .intercept(MethodDelegation.to(Bar.class))
+                .make()
+                .load(getClass().getClassLoader())
+                .getLoaded()
+                .newInstance()
+                .sayHelloFoo();
+*/
+
+
+
+        /*
+         */
+
+        String myRule = "import hellodrools.Message rule \"Hello World 2\" when message:Message (type==\"Test\") then System.out.println(\"Test, Drools!\"); end";
+
+        Resource myResource = ResourceFactory.newReaderResource(new StringReader(myRule));
+
+
+        KieServices kieServices = KieServices.Factory.get();
+        KieFileSystem kfs = kieServices.newKieFileSystem();
+        kfs.write("src/main/resources/simple.drl",
+                kieServices.getResources().newReaderResource(new StringReader(myRule)));
+        KieBuilder kieBuilder = kieServices.newKieBuilder(kfs).buildAll();
+
+     /*   KieRepository kr = ks.getRepository();
+        KieFileSystem kfs = ks.newKieFileSystem();
+
+        kfs.write("src/main/resources/org/kie/example5/HAL5.drl", getRule());
+
+        KieBuilder kb = ks.newKieBuilder(kfs);
+
+        ks.newKieBuilder(kieFileSystem).buildAll();
+        kbuilder.add(myResource, ResourceType.DRL);
+*/
 
 /*
         KieServices kieServices = KieServices.Factory.get();
@@ -26,6 +120,11 @@ public class TestDrools {
         statelessKieSession.getGlobals().set("alertDecision", alertDecision);
         statelessKieSession.execute(event);
 */
+
+        KieServices ks = KieServices.Factory.get();
+        KieContainer kContainer = ks.getKieClasspathContainer();
+        KieSession kSession = kContainer.newKieSession();
+
         Item item = new Item("A", 123.0, 234.0);
         System.out.println("Item Category: " + item.getCategory());
 //2) Provide information to the Rule Engine Context
