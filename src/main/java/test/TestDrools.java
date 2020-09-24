@@ -1,8 +1,15 @@
 package test;
 
 import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.description.modifier.FieldManifestation;
+import net.bytebuddy.description.modifier.Visibility;
 import net.bytebuddy.dynamic.DynamicType;
+import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
+import net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy;
+import net.bytebuddy.implementation.FieldAccessor;
 import net.bytebuddy.implementation.FixedValue;
+import net.bytebuddy.implementation.MethodCall;
+import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatchers;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
@@ -16,13 +23,15 @@ import org.kie.internal.io.ResourceFactory;
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 
 import static net.bytebuddy.matcher.ElementMatchers.named;
 
 
 public class TestDrools {
-    public static void main(String[] args) throws IllegalAccessException, InstantiationException {
-
+    public static void main(String[] args) throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
+/*
         Class<?> dynamicType = new ByteBuddy();
         dynamicType.asSubclass(Object.class);
         dynamicType.getMethod(ElementMatchers.named("toString"))
@@ -43,6 +52,65 @@ public class TestDrools {
         Class<?> dynamicType = unloadedType.load(TestDrools.class.getClassLoader()).getLoaded();
 
         System.out.println(dynamicType.newInstance().toString());
+*/
+
+        Class<?> newClass = new ByteBuddy()
+                .subclass(
+                        Object.class,
+                        ConstructorStrategy.Default.NO_CONSTRUCTORS
+                )
+                .name("NewClass")
+                .method(ElementMatchers.named("toString"))
+                .intercept(FixedValue.value("Hello NewClass"))
+                .defineField(
+                        "myField",
+                        String.class,
+                        Visibility.PRIVATE,
+                        FieldManifestation.PLAIN
+                )
+                .defineConstructor(Modifier.PUBLIC)
+                .withParameters(String.class)
+                .intercept(MethodCall.invoke(Object.class.getConstructor())
+                        .andThen(FieldAccessor.ofField("myField")
+                                .setsArgumentAt(0)))
+                .defineMethod(
+                        "getMyField",
+                        String.class,
+                        Modifier.PUBLIC
+                )
+                .intercept(FieldAccessor.ofField("myField"))
+                .defineMethod(
+                        "setMyField",
+                        void.class,
+                        Modifier.PUBLIC
+                )
+                .withParameters(String.class)
+                .intercept(FieldAccessor.ofField("myField").setsArgumentAt(0))
+                .make()
+                .load(ClassLoader.getSystemClassLoader())
+                .getLoaded();
+
+        Object obj = newClass.getConstructor(String.class)
+                .newInstance("Get My Field");
+        System.out.println(obj.toString());
+
+
+        Class<?> type = new ByteBuddy()
+                .subclass(newClass)
+                .name("MyClassName")
+                .defineField("newField1", String.class, Modifier.PUBLIC)
+                .defineField("newField2", String.class, Modifier.PUBLIC)
+                .make()
+                .load(
+                        obj.getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER)
+                .getLoaded();
+
+        Object obj2 = type.getConstructor(String.class)
+                .newInstance("new Field");
+        System.out.println(obj2.toString());
+//-----------------------------------------------------
+
+
 
         String toString = new ByteBuddy()
                 .subclass(Object.class)
