@@ -7,29 +7,56 @@ import net.bytebuddy.dynamic.DynamicType;
 import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
 import net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy;
 import net.bytebuddy.implementation.FieldAccessor;
-import net.bytebuddy.implementation.FixedValue;
 import net.bytebuddy.implementation.MethodCall;
-import net.bytebuddy.matcher.ElementMatchers;
 
+
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class NewClassExample2 {
 
+    public static void main(String[] args) throws NoSuchMethodException, ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException {
 
-    public void addMethod() {
+        ArrayList<Type> arrayList = new ArrayList<Type>();
+        arrayList.add(Integer.class);
+        arrayList.add(String.class);
+        // List<Type> typeList=new List<Type>() ;
+        HashMap<String, Class<?>> stringTypeHashMap = new HashMap<String, Class<?>>();
+        stringTypeHashMap.put("field1", Class.forName("java.lang.String"));
+        stringTypeHashMap.put("field2", Class.forName("java.lang.Integer"));
 
-    }
+        CreateClass createClass = new CreateClass();
+        // DynamicType.Builder<Object> builderTest = createClass.createClass("testNameClass");
+        // createClass.createClass("testNameClass");
 
-    public void addField() {
+        Class<?> classBuilderTest = createClass.createClass("testNameClass").make().load(NewClassExample2.class.getClassLoader(), ClassLoadingStrategy.Default.WRAPPER).getLoaded();
 
-    }
-
-    public void createClass() {
-
-    }
+        //  Class<?>[] array = (Class<?>[]) stringTypeHashMap.values().toArray();
+        Class<?>[] arr = {Class.forName("java.lang.String"), Class.forName("java.lang.Integer")};
 
 
-    public static void main(String[] args) throws NoSuchMethodException {
+        //classBuilderTest.newInstance();
+
+        //  classBuilderTest wef = new classBuilderTest("dfdf", 55);
+
+        Object obj = null;
+        obj = classBuilderTest.newInstance();
+        System.out.println(obj.toString());
+
+
+        CreateClass2 createClass2 = new CreateClass2();
+        createClass2.createClass("testNameClass");
+        Class<?> classBuilderTest2 = createClass2.getBuilder().make().load(NewClassExample2.class.getClassLoader(), ClassLoadingStrategy.Default.WRAPPER).getLoaded();
+
+        Object obj2 = classBuilderTest2.newInstance();
+        System.out.println(obj2.toString());
+
+        System.out.println("------------------------------------------------");
+
         DynamicType.Builder<Object> builder = new ByteBuddy()
                 .subclass(
                         Object.class,
@@ -42,11 +69,24 @@ public class NewClassExample2 {
                         Visibility.PRIVATE,
                         FieldManifestation.PLAIN
                 )
+                .defineField(
+                        "fieldConstructString1",
+                        String.class,
+                        Visibility.PUBLIC,
+                        FieldManifestation.PLAIN
+                )
+                .defineField(
+                        "fieldConstructInt2",
+                        Integer.class,
+                        Visibility.PUBLIC,
+                        FieldManifestation.PLAIN
+                )
                 .defineConstructor(Modifier.PUBLIC)
-                .withParameters(String.class)
+                .withParameters(arrayList)
                 .intercept(MethodCall.invoke(Object.class.getConstructor())
-                        .andThen(FieldAccessor.ofField("myField")
-                                .setsArgumentAt(0)))
+                        .andThen(FieldAccessor.ofField("fieldConstructInt1")
+                                .setsArgumentAt(0)).andThen(FieldAccessor.ofField("fieldConstructInt2")
+                                .setsArgumentAt(1)))
                 .defineMethod(
                         "getMyField",
                         String.class,
@@ -63,12 +103,39 @@ public class NewClassExample2 {
 
         //  DynamicType.Unloaded<Object> newClass2 = new ByteBuddy().
 
-        builder.defineField(
-                "addedField1",
-                String.class,
-                Visibility.PRIVATE,
-                FieldManifestation.PLAIN
-        );
+        // Class cls = Class.forName("String");
+        // Object obj = cls.newInstance();
+
+        try {
+            System.out.println("The first time calls forName:");
+            Class c = Class.forName("java.lang.String");
+            Object a = c.newInstance();
+            System.out.println("The second time calls forName:");
+            // Class c1 = Class.forName("com.xyzws.AClass");
+            System.out.println(a.getClass().toString());
+
+
+            builder.defineField(
+                    "addedField1",
+                    c,
+                    Visibility.PRIVATE,
+                    FieldManifestation.PLAIN
+            );
+
+            builder.defineMethod(
+                    "getMyField222",
+                    String.class,
+                    Modifier.PUBLIC
+            ).intercept(FieldAccessor.ofField("myField"));
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
 
         builder.defineMethod(
                 "getaddedField1",
@@ -87,6 +154,15 @@ public class NewClassExample2 {
         System.out.println(builderRedefine);
         System.out.println(builderRebase);
         //}
+
+        System.out.println("-----------------------------------------------------------------");
+
+
+
+
+
+
+
 
 
 

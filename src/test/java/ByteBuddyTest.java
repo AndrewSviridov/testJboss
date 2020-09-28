@@ -7,6 +7,7 @@ import java.net.URLClassLoader;
 import java.util.Collections;
 
 import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.description.modifier.FieldManifestation;
 import net.bytebuddy.description.modifier.Visibility;
 import net.bytebuddy.dynamic.DynamicType;
 import net.bytebuddy.dynamic.TypeResolutionStrategy;
@@ -98,6 +99,23 @@ public class ByteBuddyTest {
         Class<?> subclass = subclassBuilder.make().load(type.getClassLoader(), WRAPPER).getLoaded();
         MatcherAssert.assertThat(subclass.getDeclaredMethods().length, CoreMatchers.is(1000));
     }
+
+    @Test
+    public void testClassWithManyFields() throws Exception {
+        DynamicType.Builder<?> builder = new ByteBuddy().subclass(Object.class);
+        for (int index = 0; index < 1000; index++) {
+
+            builder = builder.defineField("field4" + index,
+                    String.class,
+                    Visibility.PUBLIC,
+                    FieldManifestation.PLAIN);
+        }
+        Class<?> type = builder.make().load(ClassLoadingStrategy.BOOTSTRAP_LOADER, WRAPPER).getLoaded();
+        Object ergerg = type.newInstance();
+        MatcherAssert.assertThat(type.getDeclaredFields().length, CoreMatchers.is(1000));
+
+    }
+
 
     public static class Recorder {
         public int counter;
