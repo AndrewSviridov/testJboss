@@ -13,6 +13,15 @@ repositories {
 
 dependencies {
 
+
+// https://mvnrepository.com/artifact/org.hibernate/hibernate-core
+    compile group: 'org.hibernate', name: 'hibernate-core', version: '5.4.21.Final'
+
+// https://mvnrepository.com/artifact/org.hibernate/hibernate-c3p0
+    compile group: 'org.hibernate', name: 'hibernate-c3p0', version: '5.4.21.Final'
+
+    //------------------------------------------------------------------------------
+
     // https://mvnrepository.com/artifact/net.bytebuddy/byte-buddy-agent
     testCompile group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.10.15'
 

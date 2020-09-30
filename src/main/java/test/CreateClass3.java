@@ -15,8 +15,8 @@ import java.util.HashMap;
 public class CreateClass3 {
     private DynamicType.Builder<Object> builder;
 
-    public CreateClass3() {
-        this.builder = new ByteBuddy().subclass(Object.class);
+    public CreateClass3(String nameClass) {
+        this.builder = new ByteBuddy().subclass(Object.class).name(nameClass);
     }
 
 

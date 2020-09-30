@@ -16,6 +16,8 @@ import test.CreateClass;
 import test.CreateClass3;
 import test.NewClassExample2;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -197,7 +199,7 @@ public class MyRedefineTest {
 
     @Test
     public void testMyCreateClass3() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, ClassNotFoundException, NoSuchFieldException {
-        CreateClass3 createClass3 = new CreateClass3();
+        CreateClass3 createClass3 = new CreateClass3("NameTestClass");
 
         createClass3.addField("field1", Class.forName("java.lang.String"));
         createClass3.addField("field2", Class.forName("java.lang.Integer"));
@@ -262,6 +264,14 @@ public class MyRedefineTest {
         DynamicType.Builder<Object> bulder = createClass.createClass("NameTestClass");
 
         //Class<?> type = builder.make().load(ClassLoadingStrategy.BOOTSTRAP_LOADER, WRAPPER).getLoaded();
+        //写入到本地目录
+        try {
+
+            bulder.make().saveIn(new File("src/main/java/target/classes1"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         Class<?> classBuilderTest3 = bulder.make().load(getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER).getLoaded();
 
         Object obj3 = classBuilderTest3.newInstance();
