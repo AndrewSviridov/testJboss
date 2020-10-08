@@ -15,6 +15,7 @@ import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Remove;
 import weka.filters.unsupervised.attribute.StringToNominal;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -60,6 +61,7 @@ public class testWeka {
             DatabaseLoader loader = new DatabaseLoader();
             loader.setSource(DB_URL, USER, PASS);
             loader.setQuery("select * from mytable");
+            loader.getDataSet();
             // it might be necessary to define the columns that uniquely identify
             // a single row. Just provide them as comma-separated list:
             // loader.setKeys("col1,col2,...");

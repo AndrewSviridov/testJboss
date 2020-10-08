@@ -1,17 +1,17 @@
-package hibernaite.model;
+package hibernaite.modelMy;
 
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 
 public class Variable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long idVariable;
     private String name;
-    private long variableTypeIdVariableType;
-
+    @ManyToOne//(fetch = FetchType.LAZY)
+    @JoinColumn(name = "variableType_id", nullable = false)
+    private List<VariableType> variableTypeIdVariableType;
 
     public long getIdVariable() {
         return idVariable;
@@ -30,13 +30,11 @@ public class Variable {
         this.name = name;
     }
 
-
-    public long getVariableTypeIdVariableType() {
+    public List<hibernaite.modelMy.VariableType> getVariableTypeIdVariableType() {
         return variableTypeIdVariableType;
     }
 
-    public void setVariableTypeIdVariableType(long variableTypeIdVariableType) {
+    public void setVariableTypeIdVariableType(List<hibernaite.modelMy.VariableType> variableTypeIdVariableType) {
         this.variableTypeIdVariableType = variableTypeIdVariableType;
     }
-
 }

@@ -1,4 +1,4 @@
-package hibernaite.model;
+package hibernaite.modelMy;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;

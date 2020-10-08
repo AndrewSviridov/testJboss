@@ -8,7 +8,9 @@ public class Service {
 
 
         treeDatabase test = new treeDatabase(C3POData.getDataSource().getConnection());
-        test.getRule();
-
+        //test.getRule();
+        //test.getData();
+        // test.getFunctionData();
+        test.myTest();
     }
 }

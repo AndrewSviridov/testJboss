@@ -1,15 +1,18 @@
-package hibernaite.model;
+package hibernaite.modelMy;
 
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 public class VariableType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long idVariableType;
     private String name;
+    //, cascade = CascadeType.ALL
+    //@OneToMany(mappedBy = "VariableType", orphanRemoval = true)
+    //
+    @OneToMany(mappedBy = "Variable", cascade = CascadeType.ALL)
+    private Variable varible;
 
 
     public long getIdVariableType() {

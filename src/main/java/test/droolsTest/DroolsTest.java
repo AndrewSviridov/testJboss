@@ -12,6 +12,7 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import test.CreateClass3;
 import test.KieFileSystemExample;
+import test.droolsTest.createClass.CreateByteClass;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,22 +24,22 @@ public class DroolsTest {
 
     public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
 
-        CreateClass3 createClass3 = new CreateClass3("TestMessage");
+        CreateByteClass createByteClass = new CreateByteClass("TestMessage");
 
-        createClass3.addField("name", Class.forName("java.lang.String"));
-        createClass3.addField("text", Class.forName("java.lang.String"));
+        createByteClass.addField("name", Class.forName("java.lang.String"));
+        createByteClass.addField("text", Class.forName("java.lang.String"));
 
-        createClass3.addGetMethod("getName", Class.forName("java.lang.String"), "name");
-        createClass3.addGetMethod("getText", Class.forName("java.lang.String"), "text");
+        createByteClass.addGetMethod("getName", Class.forName("java.lang.String"), "name");
+        createByteClass.addGetMethod("getText", Class.forName("java.lang.String"), "text");
 
-        createClass3.addSetMethod("setName", Class.forName("java.lang.String"), "name");
-        createClass3.addSetMethod("setText", Class.forName("java.lang.String"), "text");
+        createByteClass.addSetMethod("setName", Class.forName("java.lang.String"), "name");
+        createByteClass.addSetMethod("setText", Class.forName("java.lang.String"), "text");
 
-        createClass3.getBuilder().defineMethod(("method"), void.class, Visibility.PUBLIC).intercept(StubMethod.INSTANCE);
+        createByteClass.getBuilder().defineMethod(("method"), void.class, Visibility.PUBLIC).intercept(StubMethod.INSTANCE);
 
         //Class<?> type = builder.make().load(ClassLoadingStrategy.BOOTSTRAP_LOADER, WRAPPER).getLoaded();
 
-        Class<?> classBuilderTest3 = createClass3.getBuilder().make().load(createClass3.getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER).getLoaded();
+        Class<?> classBuilderTest3 = createByteClass.getBuilder().make().load(createByteClass.getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER).getLoaded();
 
 
         Method m = classBuilderTest3.getDeclaredMethod("setName", String.class);
@@ -83,7 +84,7 @@ public class DroolsTest {
 
 
         try {
-            createClass3.getBuilder().make().saveIn(new File("src/main/java/test/DroolsTest/createClass/" + "TestMessage"));
+            createByteClass.getBuilder().make().saveIn(new File("src/main/java/test/DroolsTest/createClass/" + "TestMessage"));
         } catch (IOException e) {
             e.printStackTrace();
         }

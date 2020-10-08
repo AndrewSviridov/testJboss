@@ -1,7 +1,6 @@
-package hibernaite.model;
+package hibernaite.modelMy;
 
 import org.hibernate.annotations.Entity;
-import org.hibernate.annotations.Table;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
