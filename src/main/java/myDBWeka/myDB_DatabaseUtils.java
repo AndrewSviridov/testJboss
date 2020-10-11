@@ -100,8 +100,9 @@ public class myDB_DatabaseUtils implements Serializable, RevisionHandler {
   /**
    * The name of the properties file.
    */
-  public final static String PROPERTY_FILE =
-          "weka/experiment/DatabaseUtils.props";
+  // todo
+  public final static String PROPERTY_FILE = "C:/Users/Andrew/wekafiles/props/postgres/DatabaseUtils.props";
+  //"weka/experiment/DatabaseUtils.props";
 
   /**
    * Holds the jdbc drivers to be used (only to stop them being gc'ed).
@@ -427,6 +428,7 @@ public class myDB_DatabaseUtils implements Serializable, RevisionHandler {
       if (value == null) {
         value = PROPERTIES.getProperty(typeUnderscore);
       }
+
       return Integer.parseInt(value);
     } catch (NumberFormatException e) {
       e.printStackTrace();
@@ -846,7 +848,7 @@ public class myDB_DatabaseUtils implements Serializable, RevisionHandler {
         }
       }
     } catch (Exception e) {
-      // ignored
+      e.printStackTrace();
     }
 
     return result;
@@ -872,7 +874,9 @@ public class myDB_DatabaseUtils implements Serializable, RevisionHandler {
                       ResultSet.CONCUR_READ_ONLY);
     } else {
       m_PreparedStatement =
+              //     m_Connection.prepareStatement(query, getSupportedCursorScrollType(),
               m_Connection.prepareStatement(query, getSupportedCursorScrollType(),
+
                       ResultSet.CONCUR_READ_ONLY);
     }
 

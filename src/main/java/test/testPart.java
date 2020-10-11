@@ -45,6 +45,7 @@ public class testPart {
         //pass the dataset to the filter
         //remove.setInputFormat(dataset);
 
+        System.out.println(dataset.toSummaryString());
 
 //        System.out.println(remove.getOutputFormat());
         //apply the filter

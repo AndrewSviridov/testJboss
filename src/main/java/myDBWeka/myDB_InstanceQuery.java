@@ -665,7 +665,7 @@ public class myDB_InstanceQuery extends myDB_DatabaseUtils implements OptionHand
       System.err.println("Executing query: " + query);
     }
     connectToDatabase();
-    if (execute(query) == false) {
+    if (!execute(query)) {
       if (m_PreparedStatement.getUpdateCount() == -1) {
         throw new Exception("Query didn't produce results");
       } else {

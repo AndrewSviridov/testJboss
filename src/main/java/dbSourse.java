@@ -1,8 +1,6 @@
 //STEP 1. Import required packages
 
-import java.sql.DriverManager;
-import java.sql.Connection;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class dbSourse {
 
@@ -29,6 +27,31 @@ public class dbSourse {
         try {
             connection = DriverManager
                     .getConnection(DB_URL, USER, PASS);
+
+
+            String result = "";
+            CallableStatement callableStatement =
+                    connection.prepareCall("{? = call pivotcode2(?,?,?,?,?)}");
+            //  CallableStatement callableStatement = connection.prepareCall(runFunction);
+
+            //----------------------------------
+
+            // output
+            callableStatement.registerOutParameter(1, Types.VARCHAR);
+
+            // input
+            callableStatement.setString(2, "public.view03");
+            callableStatement.setString(3, "record_id");
+            callableStatement.setString(4, "namefields");
+            callableStatement.setString(5, "fieldvalue");
+            callableStatement.setString(6, "type_collum");
+
+            // Run hello() function
+            callableStatement.execute();
+
+            // Get result
+            result = callableStatement.getString(1);
+            System.out.println(result);
 
         } catch (SQLException e) {
             System.out.println("Connection Failed");

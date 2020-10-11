@@ -75,9 +75,11 @@ public class testWeka {
                 if ((count % 100) == 0)
                     System.out.println(count + " rows read so far.");
             }
+
             System.out.println(data.toSummaryString());
             //System.out.println(data);
             //set class index to the last attribute
+
             data.setClassIndex(data.numAttributes() - 1);
 
             J48 cls = new J48();

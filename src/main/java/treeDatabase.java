@@ -2,10 +2,20 @@
 //STEP 1. Import required packages
 
 import myDBWeka.myDB_InstanceQuery;
+import net.bytebuddy.description.modifier.Visibility;
+import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
+import net.bytebuddy.implementation.StubMethod;
+import rule.KnowledgeBaseWeka;
+import test.droolsTest.createClass.CreateByteClass;
+import test.droolsTest.weka_algoritms.part.HandlerPart;
+import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.experiment.InstanceQuery;
 
 import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Method;
 import java.sql.*;
 
 public class treeDatabase {
@@ -15,7 +25,7 @@ public class treeDatabase {
         connection = con;
     }
 
-/*
+
     public String getRule() {
         try {
 
@@ -28,6 +38,7 @@ public class treeDatabase {
             ResultSet resultSet = statement.executeQuery(SELECT_QUERY);
 
             while (resultSet.next()) {
+
                 Array ar = resultSet.getArray(2);
                 System.out.println(resultSet.getString(2));
             }
@@ -40,7 +51,7 @@ public class treeDatabase {
     }
 
 
-
+/*
 
     public String getData() {
         try {
@@ -155,10 +166,14 @@ public class treeDatabase {
             // Get result
             result = callableStatement.getString(1);
 
+            System.out.println(result + " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            //InstanceQuery
 
             myDB_InstanceQuery query = new myDB_InstanceQuery();
+
             query.setM_Connection(connection);
-            query.setCustomPropsFile(new File("C:\\Users\\Andrew\\wekafiles\\props\\DatabaseUtils.props.postgresql"));
+            System.out.println(query.customPropsFileTipText());
+            query.setCustomPropsFile(new File("C:\\Users\\Andrew\\wekafiles\\props\\postgres\\DatabaseUtils.props"));
             query.setQuery(result);
 
             Instances data = query.retrieveInstances();
@@ -172,11 +187,90 @@ public class treeDatabase {
                 if ((count % 100) == 0)
                     System.out.println(count + " rows read so far.");
             }*/
+
+
             System.out.println(data.toSummaryString());
             //System.out.println(data);
-            //set class index to the last attribute
-            data.setClassIndex(data.numAttributes() - 1);
 
+            Attribute attrClass = data.attribute("_expassessment");
+
+
+            //set class index to the last attribute
+            // data.setClassIndex(data.numAttributes() - 1);
+            System.out.println(data.numAttributes() - 1);
+            data.setClassIndex(attrClass.index());
+
+            HandlerPart handlerPart = new HandlerPart();
+            KnowledgeBaseWeka knowledgeBaseWeka = handlerPart.getRules(data);
+
+
+            CreateByteClass createByteClass = new CreateByteClass("TestMessage");
+
+            createByteClass.addField("name", Class.forName("java.lang.String"));
+            createByteClass.addField("text", Class.forName("java.lang.String"));
+
+            createByteClass.addGetMethod("getName", Class.forName("java.lang.String"), "name");
+            createByteClass.addGetMethod("getText", Class.forName("java.lang.String"), "text");
+
+            createByteClass.addSetMethod("setName", Class.forName("java.lang.String"), "name");
+            createByteClass.addSetMethod("setText", Class.forName("java.lang.String"), "text");
+
+            createByteClass.getBuilder().defineMethod(("method"), void.class, Visibility.PUBLIC).intercept(StubMethod.INSTANCE);
+
+            //Class<?> type = builder.make().load(ClassLoadingStrategy.BOOTSTRAP_LOADER, WRAPPER).getLoaded();
+
+            Class<?> classBuilderTest3 = createByteClass.getBuilder().make().load(createByteClass.getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER).getLoaded();
+
+
+            Method m = classBuilderTest3.getDeclaredMethod("setName", String.class);
+
+            Method m2 = classBuilderTest3.getDeclaredMethod("setText", String.class);
+
+
+            Method[] classBuilderTest3Methods = classBuilderTest3.getMethods();
+            Method[] declaredMethods = classBuilderTest3.getDeclaredMethods();
+
+
+            for (Method method : declaredMethods) {
+                System.out.println(method.getName());
+                System.out.println(method.toGenericString());
+                System.out.println(method.getParameterTypes().getClass().toString());
+                System.out.println(method.getGenericParameterTypes().length);
+                System.out.println(method.getGenericReturnType().getTypeName() + " return");
+
+                System.out.println(method.getReturnType().toString() + " returnType");
+
+                if (method.getGenericParameterTypes().length != 0) {
+                    System.out.println(method.getGenericParameterTypes()[0].getTypeName() + " param");
+
+                }
+                System.out.println("----------------------------------------------");
+            }
+
+
+            for (Method method : classBuilderTest3Methods) {
+                System.out.println(method.getName());
+                // System.out.println(method.toGenericString());
+            }
+            System.out.println("----------------------------------------------");
+
+            Object obj3 = classBuilderTest3.newInstance();
+
+            //  m.invoke(obj3, "testName");
+            //m2.invoke(obj3, "testText");
+            //assertNotNull(classBuilderTest3.getDeclaredField("getField1"));
+
+            System.out.println(obj3.toString());
+
+
+            try {
+                createByteClass.getBuilder().make().saveIn(new File("src/main/java/test/DroolsTest/createClass/" + "TestMessage"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            System.out.println();
 
         } catch (Exception e) {
             e.printStackTrace();
