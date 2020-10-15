@@ -10,13 +10,10 @@ import org.kie.api.builder.KieRepository;
 import org.kie.api.builder.Message;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
-import test.CreateClass3;
-import test.KieFileSystemExample;
 import test.droolsTest.createClass.CreateByteClass;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -94,7 +91,7 @@ public class DroolsTest {
         KieRepository kr = ks.getRepository();
         KieFileSystem kfs = ks.newKieFileSystem();
 
-        kfs.write("src/main/resources/HAL5.drl", getRule());
+        kfs.write("src/main/resources/HAL5.drl", getMyRule());
 
         KieBuilder kb = ks.newKieBuilder(kfs);
 
