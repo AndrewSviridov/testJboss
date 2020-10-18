@@ -8,12 +8,14 @@ import net.bytebuddy.implementation.FieldAccessor;
 import net.bytebuddy.implementation.FixedValue;
 import net.bytebuddy.implementation.MethodCall;
 import net.bytebuddy.matcher.ElementMatchers;
+
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
 import org.kie.api.builder.KieRepository;
 import org.kie.api.builder.Message;
+import org.kie.api.definition.type.FactType;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 
@@ -175,7 +177,6 @@ public class Test1 {
         Object gdffdg = kSession.getGlobal("out");
         System.out.println(gdffdg.toString());
 
-
     }
 
 
@@ -269,6 +270,63 @@ public class Test1 {
                 .getLoaded();
 
 
+    }
+
+
+    @Test
+    public void testDeclare() throws IllegalAccessException, InstantiationException {
+
+        KieServices ks = KieServices.Factory.get();
+        KieRepository kr = ks.getRepository();
+        KieFileSystem kfs = ks.newKieFileSystem();
+
+        kfs.write("src/main/resources/HAL5.drl", getMyRuleDeclare());
+
+        KieBuilder kb = ks.newKieBuilder(kfs);
+
+        kb.buildAll(); // kieModule is automatically deployed to KieRepository if successfully built.
+        if (kb.getResults().hasMessages(Message.Level.ERROR)) {
+            throw new RuntimeException("Build Errors:\n" + kb.getResults().toString());
+        }
+
+        KieContainer kContainer = ks.newKieContainer(kr.getDefaultReleaseId());
+
+        KieSession kSession = kContainer.newKieSession();
+        kSession.setGlobal("out", System.out);
+
+        FactType testClass = kContainer.getKieBase().getFactType("TestsWeka", "TestClass");
+
+        Object first = testClass.newInstance();
+        testClass.set(first, "myField", "Hello, HAL. Do you read me, HAL?!");
+
+        kSession.insert(first);
+        kSession.fireAllRules();
+        Object gdffdg = kSession.getGlobal("out");
+        System.out.println(gdffdg.toString());
+
+
+    }
+
+//package test.droolsTest.createClass.TestMessage
+
+    private static String getMyRuleDeclare() {
+        String s =
+                "global java.io.PrintStream out \n\n" +
+                        "declare TestClass\n" +
+                        "  myField : String\n" +
+                        "end\n\n" +
+                        "rule \"rule 1\" when \n" +
+                        "    m : TestClass( );\n" +
+                        "then \n" +
+                        "    out.println( m.getField()); \n" +
+                        "end \n" +
+                        "rule \"rule 2\" when \n" +
+                        "    TestClass( myField == \"Hello, HAL. Do you read me, HAL?\" ) \n" +
+                        "then \n" +
+                        "    insert( new TestClass(\"Dave. I read you.\" ) ); \n" +
+                        "end";
+
+        return s;
     }
 
 

@@ -11,6 +11,18 @@ repositories {
     mavenCentral()
 }
 
+jar {
+    manifest {
+        attributes 'Main-Class': 'Service'
+    }
+
+    from { // include local libs
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+
+}
+
+
 dependencies {
 
 //----------------------------------------------------------------------

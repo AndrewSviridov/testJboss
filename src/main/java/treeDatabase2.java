@@ -15,7 +15,8 @@ import rule.KnowledgeBaseWeka;
 import test.droolsTest.ClassForGlobal;
 import test.droolsTest.createClass.CreateByteClass;
 import test.droolsTest.weka_algoritms.part.HandlerPart;
-import weka.core.*;
+import weka.core.Attribute;
+import weka.core.Instances;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,10 +24,10 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class treeDatabase {
+public class treeDatabase2 {
     Connection connection;
 
-    public treeDatabase(Connection con) {
+    public treeDatabase2(Connection con) {
         connection = con;
     }
 
@@ -55,45 +56,6 @@ public class treeDatabase {
         return "";
     }
 
-
-/*
-
-    public String getData() {
-        try {
-
-            String SELECT_QUERY = "SELECT \n" +
-                    "  public.value_s.\"idValue_s\",\n" +
-                    "  public.value_s.\"Fields_IK_idFields\",\n" +
-                    "  public.value_s.fieldvalue,\n" +
-                    "  public.fields_ik.\"idFields\",\n" +
-                    "  public.fields_ik.\"NameFields\",\n" +
-                    "  public.fields_ik.\"TitlesTablesFields\",\n" +
-                    "  public.fields_ik.\"UUIDFields\",\n" +
-                    "  public.fields_ik.idprecedent\n" +
-                    "FROM\n" +
-                    "  public.value_s\n" +
-                    "  INNER JOIN public.fields_ik ON (public.value_s.\"Fields_IK_idFields\" = public.fields_ik.\"idFields\")";
-            Statement statement = connection.createStatement();
-
-            ResultSet resultSet = statement.executeQuery(SELECT_QUERY);
-
-            while (resultSet.next()) {
-
-                Array ar = resultSet.getArray(2);
-                System.out.println(resultSet.getString(2));
-
-
-
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return "";
-
-    }
-*/
 
     public String getFunctionData() {
         String result = "";
@@ -208,45 +170,6 @@ public class treeDatabase {
             HandlerPart handlerPart = new HandlerPart();
             KnowledgeBaseWeka knowledgeBaseWeka = handlerPart.getRules(data);
 
-//---------------------------------------------- создание класса
-
-            CreateByteClass createByteClass = new CreateByteClass("TestMessage");
-
-            // int collums = data.numAttributes() - 1;
-
-            for (int i = 0; i < data.numAttributes(); i++) {
-                /* Fix for databases that uppercase column names */
-                // String attribName = attributeCaseFix(md.getColumnName(i + 1));
-
-                Attribute currentAttribute = data.attribute(i);
-
-                if (data.attribute(i).isNominal()) {
-                    createByteClass.addProperty(currentAttribute.name(), Class.forName("java.lang.String"));
-                }
-                if (data.attribute(i).isNumeric()) {
-                    createByteClass.addProperty(currentAttribute.name(), Class.forName("java.lang.Long"));
-                }
-                if (data.attribute(i).isString()) {
-                    createByteClass.addProperty(currentAttribute.name(), Class.forName("java.lang.String"));
-                }
-                if (data.attribute(i).isDate()) {
-                    createByteClass.addProperty(currentAttribute.name(), Class.forName("java.lang.String"));
-                }
-                if (data.attribute(i).isRelationValued()) {
-                    System.out.println("attribute is RelationValued");
-                }
-            }
-
-            Class<?> classBuilderLoaded = createByteClass.getBuilder().make().load(createByteClass.getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER).getLoaded();
-
-
-            try {
-                createByteClass.getBuilder().make().saveIn(new File("src/main/java/test/DroolsTest/createClass/" + "TestMessage"));
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
 
             //---------------------------------------------------- создание правил
 
@@ -264,26 +187,59 @@ public class treeDatabase {
 
             //   import test.droolsTest.createClass.TestMessage.test44;
 
+
             StringBuilder stringBuilder = new StringBuilder();
             //todo или из проперти или динамически
-            stringBuilder.append("package test.droolsTest.createClass; \n\n")
-                    .append("import test.droolsTest.createClass.TestMessage; \n\n")
+            stringBuilder
                     .append("global java.util.List list; \n\n")
+                    .append("\n" +
+                            "\n" +
+                            "declare " + data.classAttribute().name())
                     .append("\n\n");
+
+//---------------------------------------------- создание класса
+
+            // int collums = data.numAttributes() - 1;
+
+            for (int i = 0; i < data.numAttributes(); i++) {
+                /* Fix for databases that uppercase column names */
+                // String attribName = attributeCaseFix(md.getColumnName(i + 1));
+
+                Attribute currentAttribute = data.attribute(i);
+
+                if (data.attribute(i).isNominal()) {
+                    stringBuilder.append(currentAttribute.name() + " : String");
+                }
+                if (data.attribute(i).isNumeric()) {
+                    stringBuilder.append(currentAttribute.name() + " : Long");
+                }
+                if (data.attribute(i).isString()) {
+                    stringBuilder.append(currentAttribute.name() + " : String");
+                }
+                if (data.attribute(i).isDate()) {
+                    stringBuilder.append(currentAttribute.name() + " : String");
+                }
+                if (data.attribute(i).isRelationValued()) {
+                    System.out.println("attribute is RelationValued");
+                }
+            }
+            stringBuilder.append("\nend\n\n");
+
+
             for (int i = 0; i < knowledgeBaseWeka.getRuleForWekaArrayList().size(); i++) {
                 //RuleForWeka listCondition=knowledgeBaseWeka.getRuleForWekaArrayList().get(i).getList().get();
                 stringBuilder.append("rule \"Rule_" + i + "\" when\n");
-                stringBuilder.append(classBuilderLoaded.getName() + "(");
+                stringBuilder.append(data.classAttribute().name() + "(");
                 for (int j = 0; j < knowledgeBaseWeka.getRuleForWekaArrayList().get(i).getList().size(); j++) {
                     ConditionForWeka conditionForWeka = knowledgeBaseWeka.getRuleForWekaArrayList().get(i).getList().get(j);
                     //System.out.println(ConditionForWeka.Operator.fromValue(conditionForWeka.getOperator().getValue()));
                     //System.out.println(classBuilderLoaded.getDeclaredField(conditionForWeka.getField()).getType().toString());
                     // System.out.println(classBuilderLoaded.getDeclaredField(conditionForWeka.getField()).getType().equals(Class.forName("java.lang.String")));
-                    if (classBuilderLoaded.getDeclaredField(conditionForWeka.getField()).getType().equals(Class.forName("java.lang.String"))) {
-                        stringBuilder.append(conditionForWeka.getField() + ConditionForWeka.Operator.fromValue(conditionForWeka.getOperator().getValue()) + "\"" + conditionForWeka.getValue() + "\"");
-                    } else {
+                 /*   if (classBuilderLoaded.getDeclaredField(conditionForWeka.getField()).getType().equals(Class.forName("java.lang.String"))) {
+                        stringBuilder.append(conditionForWeka.getField() + ConditionForWeka.Operator.fromValue(conditionForWeka.getOperator().getValue()) + "\""+conditionForWeka.getValue()+"\"");
+                    }else {
                         stringBuilder.append(conditionForWeka.getField() + ConditionForWeka.Operator.fromValue(conditionForWeka.getOperator().getValue()) + conditionForWeka.getValue());
-                    }
+                    }*/
                     stringBuilder.append(" && ");
                 }
                 stringBuilder.delete(stringBuilder.length() - 4, stringBuilder.length());

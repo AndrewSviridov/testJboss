@@ -38,7 +38,7 @@ import static org.junit.Assert.assertEquals;
 public class MyRedefineTest {
 
     class Foo {
-        String field1 = "123";
+ /*       String field1 = "123";
 
         public String getField1() {
             return field1;
@@ -50,6 +50,8 @@ public class MyRedefineTest {
                     "field1='" + field1 + '\'' +
                     '}';
         }
+
+  */
     }
 
     class Bar {

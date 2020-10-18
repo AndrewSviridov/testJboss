@@ -38,6 +38,13 @@ public class DroolsTest {
 
         Class<?> classBuilderTest3 = createByteClass.getBuilder().make().load(createByteClass.getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER).getLoaded();
 
+        //  System.out.println(classBuilderTest3.getClassLoader().getParent().getClass().toString());
+
+        // System.out.println(type.getTypeDescription());
+        System.out.println(classBuilderTest3.newInstance().getClass().getClassLoader().getParent());
+        System.out.println(classBuilderTest3.getName());
+        System.out.println(classBuilderTest3.getClassLoader());
+
 
         Method m = classBuilderTest3.getDeclaredMethod("setName", String.class);
 
@@ -47,7 +54,7 @@ public class DroolsTest {
         Method[] classBuilderTest3Methods = classBuilderTest3.getMethods();
         Method[] declaredMethods = classBuilderTest3.getDeclaredMethods();
 
-
+/*
         for (Method method : declaredMethods) {
             System.out.println(method.getName());
             System.out.println(method.toGenericString());
@@ -70,7 +77,7 @@ public class DroolsTest {
             // System.out.println(method.toGenericString());
         }
         System.out.println("----------------------------------------------");
-
+*/
         Object obj3 = classBuilderTest3.newInstance();
 
         //  m.invoke(obj3, "testName");
@@ -119,7 +126,7 @@ public class DroolsTest {
     private static String getMyRule() {
         String s = "" +
                 "package test.droolsTest.createClass \n\n" +
-                "import createClass.TestMessage \n\n" +
+                "import createClass.TestMessage.TestMessage \n\n" +
                 "global java.io.PrintStream out \n\n" +
                 "rule \"rule 1\" when \n" +
                 "    m : TestMessage( ) \n" +

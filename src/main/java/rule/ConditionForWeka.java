@@ -7,7 +7,7 @@ public class ConditionForWeka {
 
 
     private String field;
-    private Object value;
+    private String value;
     private ConditionForWeka.Operator operator;
 
     public String getField() {
@@ -22,7 +22,7 @@ public class ConditionForWeka {
         return value;
     }
 
-    public void setValue(Object value) {
+    public void setValue(String value) {
         this.value = value;
     }
 
@@ -68,11 +68,17 @@ public class ConditionForWeka {
         private final String name;
         private final String value;
 
-        private static Map<String, Operator> constants = new HashMap<String, Operator>();
+        public String getValue() {
+            return value;
+        }
+
+        private static final Map<String, Operator> constants = new HashMap<String, Operator>();
 
         static {
             for (Operator c : values()) {
+
                 constants.put(c.value, c);
+
             }
         }
 

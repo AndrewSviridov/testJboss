@@ -57,4 +57,23 @@ public class CreateByteClass {
 
     }
 
+    public void addProperty(String nameField, Class nameClass) {
+        builder = builder.defineField(
+                nameField,
+                nameClass,
+                Visibility.PRIVATE,
+                FieldManifestation.PLAIN
+        ).defineMethod(
+                "get" + nameField,
+                nameClass,
+                Modifier.PUBLIC
+        ).intercept(FieldAccessor.ofField(nameField)).defineMethod(
+                "set" + nameField,
+                void.class,
+                Modifier.PUBLIC
+        )
+                .withParameters(nameClass)
+                .intercept(FieldAccessor.ofField(nameField).setsArgumentAt(0));
+    }
+
 }

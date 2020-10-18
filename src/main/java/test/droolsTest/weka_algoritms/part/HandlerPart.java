@@ -44,7 +44,11 @@ public class HandlerPart {
                     if (i.contains(sign)) {
                         String[] arrPartCon2 = i.split(sign);
                         newCond.setField(arrPartCon2[0].trim());
-                        newCond.setOperator(ConditionForWeka.Operator.fromValue(sign));
+                        if (ConditionForWeka.Operator.fromValue(sign).equals(ConditionForWeka.Operator.EQUAL)) {
+                            newCond.setOperator(ConditionForWeka.Operator.EQUAL_TO);
+                        } else {
+                            newCond.setOperator(ConditionForWeka.Operator.fromValue(sign));
+                        }
                         rule.getList().add(newCond);
                         if (arrPartCon2[1].contains(":")) {
                             String[] arr22 = arrPartCon2[1].split(":");

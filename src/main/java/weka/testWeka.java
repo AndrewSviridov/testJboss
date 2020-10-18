@@ -69,13 +69,13 @@ public class testWeka {
             Instances data = new Instances(structure);
             Instance inst;
             int count = 0;
-            while ((inst = loader.getNextInstance(structure)) != null) {
+  /*          while ((inst = loader.getNextInstance(structure)) != null) {
                 data.add(inst);
                 count++;
                 if ((count % 100) == 0)
                     System.out.println(count + " rows read so far.");
             }
-
+*/
             System.out.println(data.toSummaryString());
             //System.out.println(data);
             //set class index to the last attribute
