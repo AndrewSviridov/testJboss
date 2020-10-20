@@ -38,7 +38,7 @@ public class DroolsTest {
 
         Class<?> classBuilderTest3 = createByteClass.getBuilder().make().load(createByteClass.getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER).getLoaded();
 
-        //  System.out.println(classBuilderTest3.getClassLoader().getParent().getClass().toString());
+      //  System.out.println(classBuilderTest3.getClassLoader().getParent().getClass().toString());
 
         // System.out.println(type.getTypeDescription());
         System.out.println(classBuilderTest3.newInstance().getClass().getClassLoader().getParent());

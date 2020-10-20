@@ -39,17 +39,18 @@ public class HandlerPart {
             for (String i : arrPartCon) {
                 ConditionForWeka newCond = new ConditionForWeka();
                 System.out.println();
-                String[] arrSign = new String[]{"=", ">", "<", "!=", ">=", "<="};
+                String[] arrSign = new String[]{"!=", ">=", "<=", "=", ">", "<"};
                 for (String sign : arrSign) {
-                    if (i.contains(sign)) {
-                        String[] arrPartCon2 = i.split(sign);
+                    // if (i.contains(sign)) {
+                    String[] arrPartCon2 = i.split(sign);
+                    if (arrPartCon2.length != 1) {
                         newCond.setField(arrPartCon2[0].trim());
                         if (ConditionForWeka.Operator.fromValue(sign).equals(ConditionForWeka.Operator.EQUAL)) {
                             newCond.setOperator(ConditionForWeka.Operator.EQUAL_TO);
                         } else {
                             newCond.setOperator(ConditionForWeka.Operator.fromValue(sign));
                         }
-                        rule.getList().add(newCond);
+
                         if (arrPartCon2[1].contains(":")) {
                             String[] arr22 = arrPartCon2[1].split(":");
                             newCond.setValue(arr22[0].trim());
@@ -59,6 +60,8 @@ public class HandlerPart {
                         } else {
                             newCond.setValue(arrPartCon2[1].trim());
                         }
+                        rule.getList().add(newCond);
+                        break;
                     }
                 }
 

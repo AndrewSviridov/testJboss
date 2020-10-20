@@ -9,6 +9,15 @@ public class ConditionForWeka {
     private String field;
     private String value;
     private ConditionForWeka.Operator operator;
+    private String typeClass;
+
+    public String getTypeClass() {
+        return typeClass;
+    }
+
+    public void setTypeClass(String typeClass) {
+        this.typeClass = typeClass;
+    }
 
     public String getField() {
         return field;

@@ -2,31 +2,35 @@
 //STEP 1. Import required packages
 
 import myDBWeka.myDB_InstanceQuery;
-import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
+import org.kie.api.KieBase;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
-import org.kie.api.builder.KieRepository;
 import org.kie.api.builder.Message;
+import org.kie.api.builder.model.KieModuleModel;
+import org.kie.api.definition.type.FactType;
+import org.kie.api.io.KieResources;
+import org.kie.api.io.Resource;
+import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
+import org.kie.internal.utils.KieHelper;
 import rule.ConditionForWeka;
 import rule.KnowledgeBaseWeka;
 import test.droolsTest.ClassForGlobal;
-import test.droolsTest.createClass.CreateByteClass;
 import test.droolsTest.weka_algoritms.part.HandlerPart;
-import weka.core.*;
+import weka.core.Attribute;
+import weka.core.Instances;
 
 import java.io.File;
-import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class treeDatabase {
+public class treeDatabase3 {
     Connection connection;
 
-    public treeDatabase(Connection con) {
+    public treeDatabase3(Connection con) {
         connection = con;
     }
 
@@ -55,45 +59,6 @@ public class treeDatabase {
         return "";
     }
 
-
-/*
-
-    public String getData() {
-        try {
-
-            String SELECT_QUERY = "SELECT \n" +
-                    "  public.value_s.\"idValue_s\",\n" +
-                    "  public.value_s.\"Fields_IK_idFields\",\n" +
-                    "  public.value_s.fieldvalue,\n" +
-                    "  public.fields_ik.\"idFields\",\n" +
-                    "  public.fields_ik.\"NameFields\",\n" +
-                    "  public.fields_ik.\"TitlesTablesFields\",\n" +
-                    "  public.fields_ik.\"UUIDFields\",\n" +
-                    "  public.fields_ik.idprecedent\n" +
-                    "FROM\n" +
-                    "  public.value_s\n" +
-                    "  INNER JOIN public.fields_ik ON (public.value_s.\"Fields_IK_idFields\" = public.fields_ik.\"idFields\")";
-            Statement statement = connection.createStatement();
-
-            ResultSet resultSet = statement.executeQuery(SELECT_QUERY);
-
-            while (resultSet.next()) {
-
-                Array ar = resultSet.getArray(2);
-                System.out.println(resultSet.getString(2));
-
-
-
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return "";
-
-    }
-*/
 
     public String getFunctionData() {
         String result = "";
@@ -208,46 +173,6 @@ public class treeDatabase {
             HandlerPart handlerPart = new HandlerPart();
             KnowledgeBaseWeka knowledgeBaseWeka = handlerPart.getRules(data);
 
-//---------------------------------------------- создание класса
-
-            CreateByteClass createByteClass = new CreateByteClass("TestMessage");
-
-           // int collums = data.numAttributes() - 1;
-
-            for (int i = 0; i < data.numAttributes(); i++) {
-                /* Fix for databases that uppercase column names */
-                // String attribName = attributeCaseFix(md.getColumnName(i + 1));
-
-                Attribute currentAttribute = data.attribute(i);
-
-                if (data.attribute(i).isNominal()) {
-                    createByteClass.addProperty(currentAttribute.name(), Class.forName("java.lang.String"));
-                }
-                if (data.attribute(i).isNumeric()) {
-                    createByteClass.addProperty(currentAttribute.name(), Class.forName("java.lang.Long"));
-                }
-                if (data.attribute(i).isString()) {
-                    createByteClass.addProperty(currentAttribute.name(), Class.forName("java.lang.String"));
-                }
-                if (data.attribute(i).isDate()) {
-                    createByteClass.addProperty(currentAttribute.name(), Class.forName("java.lang.String"));
-                }
-                if (data.attribute(i).isRelationValued()) {
-                    System.out.println("attribute is RelationValued");
-                }
-            }
-
-            Class<?> classBuilderLoaded = createByteClass.getBuilder().make().load(createByteClass.getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER).getLoaded();
-
-
-            try {
-                createByteClass.getBuilder().make().saveIn(new File("src/main/java/test/DroolsTest/createClass/" + "TestMessage"));
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
 
             //---------------------------------------------------- создание правил
 
@@ -265,35 +190,79 @@ public class treeDatabase {
 
             //   import test.droolsTest.createClass.TestMessage.test44;
 
+
             StringBuilder stringBuilder = new StringBuilder();
             //todo или из проперти или динамически
-            stringBuilder.append("package test.droolsTest.createClass; \n\n")
-                    .append("import test.droolsTest.createClass.TestMessage; \n\n")
+            stringBuilder
+                    .append("package org.kie1; \n\n ")
+                    .append("import test.droolsTest.ClassForGlobal; \n\n")
                     .append("global java.util.List list; \n\n")
+                    .append("dialect  \"mvel\" \n\n")
+                    .append("\n" +
+                            "\n" +
+                            "declare " + data.classAttribute().name())
                     .append("\n\n");
+
+//---------------------------------------------- создание класса
+
+            // int collums = data.numAttributes() - 1;
+
+            for (int i = 0; i < data.numAttributes(); i++) {
+                /* Fix for databases that uppercase column names */
+                // String attribName = attributeCaseFix(md.getColumnName(i + 1));
+
+                Attribute currentAttribute = data.attribute(i);
+
+                if (data.attribute(i).isNominal()) {
+                    stringBuilder.append(currentAttribute.name() + " : String\n");
+                }
+                if (data.attribute(i).isNumeric()) {
+                    stringBuilder.append(currentAttribute.name() + " : Long\n");
+                }
+                if (data.attribute(i).isString()) {
+                    stringBuilder.append(currentAttribute.name() + " : String\n");
+                }
+                if (data.attribute(i).isDate()) {
+                    stringBuilder.append(currentAttribute.name() + " : String\n");
+                }
+                if (data.attribute(i).isRelationValued()) {
+                    System.out.println("attribute is RelationValued");
+                }
+            }
+            stringBuilder.append("\nend\n\n");
+
+
             for (int i = 0; i < knowledgeBaseWeka.getRuleForWekaArrayList().size(); i++) {
                 //RuleForWeka listCondition=knowledgeBaseWeka.getRuleForWekaArrayList().get(i).getList().get();
-                stringBuilder.append("rule \"Rule_" + i + "\" when\n");
-                stringBuilder.append(classBuilderLoaded.getName() + "(");
+                stringBuilder.append("rule Rule_" + i + " when\n");
+                stringBuilder.append(data.classAttribute().name() + "(");
                 for (int j = 0; j < knowledgeBaseWeka.getRuleForWekaArrayList().get(i).getList().size(); j++) {
                     ConditionForWeka conditionForWeka = knowledgeBaseWeka.getRuleForWekaArrayList().get(i).getList().get(j);
+
+                    if (getType(data.attribute(conditionForWeka.getField())).equals("java.lang.String")) {
+                        stringBuilder.append(conditionForWeka.getField() + ConditionForWeka.Operator.fromValue(conditionForWeka.getOperator().getValue()) + "\"" + conditionForWeka.getValue() + "\"");
+                    }
+
+                    if (getType(data.attribute(conditionForWeka.getField())).equals("java.lang.Long")) {
+                        stringBuilder.append(conditionForWeka.getField() + ConditionForWeka.Operator.fromValue(conditionForWeka.getOperator().getValue()) + conditionForWeka.getValue());
+                    }
                     //System.out.println(ConditionForWeka.Operator.fromValue(conditionForWeka.getOperator().getValue()));
                     //System.out.println(classBuilderLoaded.getDeclaredField(conditionForWeka.getField()).getType().toString());
                     // System.out.println(classBuilderLoaded.getDeclaredField(conditionForWeka.getField()).getType().equals(Class.forName("java.lang.String")));
-                    if (classBuilderLoaded.getDeclaredField(conditionForWeka.getField()).getType().equals(Class.forName("java.lang.String"))) {
-                        stringBuilder.append(conditionForWeka.getField() + ConditionForWeka.Operator.fromValue(conditionForWeka.getOperator().getValue()) + "\"" + conditionForWeka.getValue() + "\"");
-                    } else {
+                 /*   if (classBuilderLoaded.getDeclaredField(conditionForWeka.getField()).getType().equals(Class.forName("java.lang.String"))) {
+                        stringBuilder.append(conditionForWeka.getField() + ConditionForWeka.Operator.fromValue(conditionForWeka.getOperator().getValue()) + "\""+conditionForWeka.getValue()+"\"");
+                    }else {
                         stringBuilder.append(conditionForWeka.getField() + ConditionForWeka.Operator.fromValue(conditionForWeka.getOperator().getValue()) + conditionForWeka.getValue());
-                    }
+                    }*/
                     stringBuilder.append(" && ");
                 }
                 stringBuilder.delete(stringBuilder.length() - 4, stringBuilder.length());
                 stringBuilder.append(") \n");
                 stringBuilder.append("then \n");
-                stringBuilder.append("list.add(new ClassForGlobal("
-                        + knowledgeBaseWeka.getRuleForWekaArrayList().get(i).getThenPart()
-                        + "," + knowledgeBaseWeka.getRuleForWekaArrayList().get(i).getInfo()
-                        + ",Rule_" + i + "));");
+                stringBuilder.append("list.add(new ClassForGlobal(");
+                stringBuilder.append("\"" + knowledgeBaseWeka.getRuleForWekaArrayList().get(i).getThenPart() + "\",");
+                stringBuilder.append("\"" + knowledgeBaseWeka.getRuleForWekaArrayList().get(i).getInfo() + "\",");
+                stringBuilder.append("\"Rule_" + i + "\"));");
 
                 stringBuilder.append("\nend;\n\n");
 
@@ -304,26 +273,27 @@ public class treeDatabase {
 
 // работа с drools
 
-            KieServices ks = KieServices.Factory.get();
-            KieRepository kr = ks.getRepository();
-            KieFileSystem kfs = ks.newKieFileSystem();
 
-            kfs.write("src/main/resources/myRules.drl", stringBuilder.toString());
+            KieHelper helper = new KieHelper();
+            helper.addContent(stringBuilder.toString(), ResourceType.DRL);
 
-            KieBuilder kb = ks.newKieBuilder(kfs);
+            List<Message> msg = helper.verify().getMessages(Message.Level.ERROR);
+            System.out.println(msg);
 
-            kb.buildAll(); // kieModule is automatically deployed to KieRepository if successfully built.
-            if (kb.getResults().hasMessages(Message.Level.ERROR)) {
-                throw new RuntimeException("Build Errors:\n" + kb.getResults().toString());
-            }
+            KieBase kieBase = helper.build();
+            FactType type = kieBase.getFactType("org.kie1", "_expassessment");
+//        assertEquals( 2, type.getFields().size() );
+            System.out.println(type.getName());
 
-            KieContainer kContainer = ks.newKieContainer(kr.getDefaultReleaseId());
+            KieSession kSession = kieBase.newKieSession();
+            //FactHandle handle = session.insert( foo );
+            // int n = session.fireAllRules( 5 );
 
-            KieSession kSession = kContainer.newKieSession();
 
             List<ClassForGlobal> list = new ArrayList<>();
             kSession.setGlobal("list", list);
 
+            // вставить
             //kSession.insert(new test.Message("Dave", "Hello, HAL. Do you read me, HAL?"));
             kSession.fireAllRules();
             List<ClassForGlobal> outputGlobalList = (List<ClassForGlobal>) kSession.getGlobal("list");
@@ -335,56 +305,8 @@ public class treeDatabase {
             }
 
             System.out.println();
-            System.out.println("Средняя оценка " + sumRules / outputGlobalList.size());
-
-
-            //     ksession.setGlobal("list", list);
-
-/*
-            StringBuilder opt = new StringBuilder();
-            int numAttr = data.numAttributes() - 1;
-            System.out.println(data.checkForStringAttributes());
-            for (int i = 0; i < numAttr; i++) {
-                //check if current attr is of type nominal
-                System.out.println(data.attribute(i).index());
-
-                if (data.attribute(i).isString()) {
-
-                    opt.append(" ").append(i);
-
-                    System.out.println("The " + i + "th Attribute is String");
-                    //get number of values
-                    int n = data.attribute(i).numValues();
-                    System.out.println("The " + i + "th Attribute has: " + n + " values");
-                }
-
-                //get an AttributeStats object
-                AttributeStats as = data.attributeStats(i);
-                int dC = as.distinctCount;
-                System.out.println("The " + i + "th Attribute has: " + dC + " distinct values");
-
-                //get a Stats object from the AttributeStats
-                if (data.attribute(i).isNumeric()) {
-                    System.out.println("The " + i + "th Attribute is Numeric");
-                    Stats s = as.numericStats;
-                    System.out.println("The " + i + "th Attribute has min value: " + s.min + " and max value: " + s.max + " and mean value: " + s.mean);
-                }
-
-                if (data.attribute(i).isNominal()) {
-                    System.out.println("The " + i + "th Attribute is Numeric");
-                    Stats s = as.numericStats;
-                    System.out.println("The " + i + "th Attribute has min value: " + s.min + " and max value: " + s.max + " and mean value: " + s.mean);
-                }
-
-
-            }
-
-
-
-            System.out.println(opt);
-
-
- */
+            if (sumRules != 0)
+                System.out.println("Средняя оценка " + sumRules / outputGlobalList.size());
 
             System.out.println();
 
@@ -397,6 +319,30 @@ public class treeDatabase {
             e.printStackTrace();
         }
     }
+
+
+    public String getType(Attribute attribute) {
+        //Class.forName("java.lang.String")
+        String result = "";
+        if (attribute.isNominal()) {
+            result = "java.lang.String";
+        }
+        if (attribute.isNumeric()) {
+            result = "java.lang.Long";
+        }
+        if (attribute.isString()) {
+            result = "java.lang.String";
+        }
+        if (attribute.isDate()) {
+            result = "java.lang.String";
+        }
+        if (attribute.isRelationValued()) {
+            result = "attribute is RelationValued";
+        }
+        return result;
+    }
+
+
 }
 
 /*

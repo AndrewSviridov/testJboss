@@ -2,26 +2,30 @@
 //STEP 1. Import required packages
 
 import myDBWeka.myDB_InstanceQuery;
-import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
 import org.kie.api.builder.KieRepository;
 import org.kie.api.builder.Message;
+import org.kie.api.builder.model.KieModuleModel;
+import org.kie.api.definition.type.FactType;
+import org.kie.api.io.KieResources;
+import org.kie.api.io.Resource;
+import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.rule.FactHandle;
 import rule.ConditionForWeka;
 import rule.KnowledgeBaseWeka;
 import test.droolsTest.ClassForGlobal;
-import test.droolsTest.createClass.CreateByteClass;
 import test.droolsTest.weka_algoritms.part.HandlerPart;
 import weka.core.Attribute;
 import weka.core.Instances;
 
 import java.io.File;
-import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class treeDatabase2 {
@@ -191,7 +195,10 @@ public class treeDatabase2 {
             StringBuilder stringBuilder = new StringBuilder();
             //todo или из проперти или динамически
             stringBuilder
+                    .append("package org.kie1; \n\n ")
+                    .append("import test.droolsTest.ClassForGlobal; \n\n")
                     .append("global java.util.List list; \n\n")
+                    .append("dialect  \"mvel\" \n\n")
                     .append("\n" +
                             "\n" +
                             "declare " + data.classAttribute().name())
@@ -208,16 +215,16 @@ public class treeDatabase2 {
                 Attribute currentAttribute = data.attribute(i);
 
                 if (data.attribute(i).isNominal()) {
-                    stringBuilder.append(currentAttribute.name() + " : String");
+                    stringBuilder.append(currentAttribute.name() + " : String\n");
                 }
                 if (data.attribute(i).isNumeric()) {
-                    stringBuilder.append(currentAttribute.name() + " : Long");
+                    stringBuilder.append(currentAttribute.name() + " : Long\n");
                 }
                 if (data.attribute(i).isString()) {
-                    stringBuilder.append(currentAttribute.name() + " : String");
+                    stringBuilder.append(currentAttribute.name() + " : String\n");
                 }
                 if (data.attribute(i).isDate()) {
-                    stringBuilder.append(currentAttribute.name() + " : String");
+                    stringBuilder.append(currentAttribute.name() + " : String\n");
                 }
                 if (data.attribute(i).isRelationValued()) {
                     System.out.println("attribute is RelationValued");
@@ -228,10 +235,18 @@ public class treeDatabase2 {
 
             for (int i = 0; i < knowledgeBaseWeka.getRuleForWekaArrayList().size(); i++) {
                 //RuleForWeka listCondition=knowledgeBaseWeka.getRuleForWekaArrayList().get(i).getList().get();
-                stringBuilder.append("rule \"Rule_" + i + "\" when\n");
+                stringBuilder.append("rule Rule_" + i + " when\n");
                 stringBuilder.append(data.classAttribute().name() + "(");
                 for (int j = 0; j < knowledgeBaseWeka.getRuleForWekaArrayList().get(i).getList().size(); j++) {
                     ConditionForWeka conditionForWeka = knowledgeBaseWeka.getRuleForWekaArrayList().get(i).getList().get(j);
+
+                    if (getType(data.attribute(conditionForWeka.getField())).equals("java.lang.String")) {
+                        stringBuilder.append(conditionForWeka.getField() + ConditionForWeka.Operator.fromValue(conditionForWeka.getOperator().getValue()) + "\"" + conditionForWeka.getValue() + "\"");
+                    }
+
+                    if (getType(data.attribute(conditionForWeka.getField())).equals("java.lang.Long")) {
+                        stringBuilder.append(conditionForWeka.getField() + ConditionForWeka.Operator.fromValue(conditionForWeka.getOperator().getValue()) + conditionForWeka.getValue());
+                    }
                     //System.out.println(ConditionForWeka.Operator.fromValue(conditionForWeka.getOperator().getValue()));
                     //System.out.println(classBuilderLoaded.getDeclaredField(conditionForWeka.getField()).getType().toString());
                     // System.out.println(classBuilderLoaded.getDeclaredField(conditionForWeka.getField()).getType().equals(Class.forName("java.lang.String")));
@@ -245,10 +260,10 @@ public class treeDatabase2 {
                 stringBuilder.delete(stringBuilder.length() - 4, stringBuilder.length());
                 stringBuilder.append(") \n");
                 stringBuilder.append("then \n");
-                stringBuilder.append("list.add(new ClassForGlobal("
-                        + knowledgeBaseWeka.getRuleForWekaArrayList().get(i).getThenPart()
-                        + "," + knowledgeBaseWeka.getRuleForWekaArrayList().get(i).getInfo()
-                        + ",Rule_" + i + "));");
+                stringBuilder.append("list.add(new ClassForGlobal(");
+                stringBuilder.append("\"" + knowledgeBaseWeka.getRuleForWekaArrayList().get(i).getThenPart() + "\",");
+                stringBuilder.append("\"" + knowledgeBaseWeka.getRuleForWekaArrayList().get(i).getInfo() + "\",");
+                stringBuilder.append("\"Rule_" + i + "\"));");
 
                 stringBuilder.append("\nend;\n\n");
 
@@ -259,26 +274,82 @@ public class treeDatabase2 {
 
 // работа с drools
 
+
             KieServices ks = KieServices.Factory.get();
-            KieRepository kr = ks.getRepository();
             KieFileSystem kfs = ks.newKieFileSystem();
 
-            kfs.write("src/main/resources/myRules.drl", stringBuilder.toString());
 
-            KieBuilder kb = ks.newKieBuilder(kfs);
+            kfs.generateAndWritePomXML(ks.newReleaseId("test", "foo", "1.0"));
+            KieModuleModel km = ks.newKieModuleModel();
+            km.newKieBaseModel("rules")
+                    .addPackage("org.kie1");
 
-            kb.buildAll(); // kieModule is automatically deployed to KieRepository if successfully built.
-            if (kb.getResults().hasMessages(Message.Level.ERROR)) {
-                throw new RuntimeException("Build Errors:\n" + kb.getResults().toString());
+            km.newKieBaseModel("rules").setDefault(true);
+
+            kfs.writeKModuleXML(km.toXML());
+
+            KieResources kr = ks.getResources();
+            Resource r1 = kr.newByteArrayResource(stringBuilder.toString().getBytes())
+                    .setResourceType(ResourceType.DRL)
+                    .setSourcePath("org/kie1/myRules.drl");
+
+            kfs.write(r1);
+
+            KieBuilder builder = ks.newKieBuilder(kfs);
+
+            builder.buildAll(); // kieModule is automatically deployed to KieRepository if successfully built.
+            if (builder.getResults().hasMessages(Message.Level.ERROR)) {
+                throw new RuntimeException("Build Errors:\n" + builder.getResults().toString());
             }
 
-            KieContainer kContainer = ks.newKieContainer(kr.getDefaultReleaseId());
+            //assertEquals( Collections.emptyList(), builder.getResults().getMessages( Message.Level.ERROR ) );
 
-            KieSession kSession = kContainer.newKieSession();
+            System.out.println(builder.getKieModule().getReleaseId());
+
+            KieContainer kc = ks.newKieContainer(builder.getKieModule().getReleaseId());
+            FactType ft = kc.getKieBase("rules").getFactType("org.kie1", data.classAttribute().name());
+
+            System.out.println(ft.getName());
+
+
+         /*   assertNotNull( ft );
+            assertNotNull( ft.getFactClass() );
+            assertEquals( "org.drools.compiler.test1.Parent", ft.getFactClass().getSuperclass().getName() );
+*/
+
+
+  /*          Object first = ft.newInstance();
+            ft.set(first, "myField", "Hello, HAL. Do you read me, HAL?!");
+
+            kSession.insert(first);
+            kSession.fireAllRules();
+            Object outObj = kSession.getGlobal("out");
+            System.out.println(outObj.toString());
+
+            Object foo = null;
+            try {
+                foo = ft.newInstance();
+                ft.set( foo, "myField", "bar" );
+                assertEquals( "bar", type.get( foo, "myField" ) );
+            } catch ( InstantiationException e ) {
+                fail( e.getMessage() );
+            } catch ( IllegalAccessException e ) {
+                fail( e.getMessage() );
+            }
+*/
+
+        /*    KieSession session = kieBase.newKieSession();
+            FactHandle handle = session.insert( foo );
+            int n = session.fireAllRules( 5 );
+*/
+
+
+            KieSession kSession = kc.getKieBase("rules").newKieSession();
 
             List<ClassForGlobal> list = new ArrayList<>();
             kSession.setGlobal("list", list);
 
+            // вставить
             //kSession.insert(new test.Message("Dave", "Hello, HAL. Do you read me, HAL?"));
             kSession.fireAllRules();
             List<ClassForGlobal> outputGlobalList = (List<ClassForGlobal>) kSession.getGlobal("list");
@@ -290,7 +361,8 @@ public class treeDatabase2 {
             }
 
             System.out.println();
-            System.out.println("Средняя оценка " + sumRules / outputGlobalList.size());
+            if (sumRules != 0)
+                System.out.println("Средняя оценка " + sumRules / outputGlobalList.size());
 
 
             //     ksession.setGlobal("list", list);
@@ -352,6 +424,30 @@ public class treeDatabase2 {
             e.printStackTrace();
         }
     }
+
+
+    public String getType(Attribute attribute) {
+        //Class.forName("java.lang.String")
+        String result = "";
+        if (attribute.isNominal()) {
+            result = "java.lang.String";
+        }
+        if (attribute.isNumeric()) {
+            result = "java.lang.Long";
+        }
+        if (attribute.isString()) {
+            result = "java.lang.String";
+        }
+        if (attribute.isDate()) {
+            result = "java.lang.String";
+        }
+        if (attribute.isRelationValued()) {
+            result = "attribute is RelationValued";
+        }
+        return result;
+    }
+
+
 }
 
 /*

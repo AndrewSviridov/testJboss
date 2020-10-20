@@ -19,7 +19,7 @@ import java.lang.reflect.InvocationTargetException;
 
 public class declareTest {
     public static void main(String[] args) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, IOException {
-        testDeclare();
+       testDeclare();
     }
 
 
@@ -80,7 +80,8 @@ public class declareTest {
 
     private static String getMyRuleDeclare() {
         String s =
-                "declare TestClass\n" +
+                "global java.io.PrintStream out \n\n" +
+                        "declare TestClass\n" +
                         "  myField : String\n" +
                         "end\n\n";
 
