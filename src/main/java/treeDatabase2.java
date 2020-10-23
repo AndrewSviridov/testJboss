@@ -350,7 +350,21 @@ public class treeDatabase2 {
             kSession.setGlobal("list", list);
 
             // вставить
-            //kSession.insert(new test.Message("Dave", "Hello, HAL. Do you read me, HAL?"));
+
+            Object fcObject = null;
+            try {
+                fcObject = ft.newInstance();
+                System.out.println(ft.getFields());
+                ft.set(fcObject, "_bathfullness", 2L);
+                //assertEquals( "bar", type.get( fcObject, "myField" ) );
+            } catch (InstantiationException e) {
+                //fail( e.getMessage() );
+            } catch (IllegalAccessException e) {
+                //fail( e.getMessage() );
+            }
+
+
+            // kSession.insert(new test.Message("Dave", "Hello, HAL. Do you read me, HAL?"));
             kSession.fireAllRules();
             List<ClassForGlobal> outputGlobalList = (List<ClassForGlobal>) kSession.getGlobal("list");
 
