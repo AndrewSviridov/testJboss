@@ -26,6 +26,7 @@ import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public class treeDatabase2 {
@@ -148,6 +149,11 @@ public class treeDatabase2 {
             query.setQuery(result);
 
             Instances data = query.retrieveInstances();
+
+            System.out.println("------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!------------");
+            //  HashMap<String, Class> regrg = query.getStringClassMapAttributes();
+            System.out.println(query.getStringClassMapAttributes().toString());
+
 
 
           /*  Instance inst;

@@ -26,11 +26,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.*;
 
 import weka.core.Attribute;
 import weka.core.DenseInstance;
@@ -115,6 +111,22 @@ public class myDB_InstanceQuery extends myDB_DatabaseUtils implements OptionHand
    * the custom props file to use instead of default one.
    */
   protected File m_CustomPropsFile = null;
+
+
+  //----------------------------------------------------------------------------
+  //
+  protected HashMap<String, Class> stringClassMapAttributes = null;
+
+  public HashMap<String, Class> getStringClassMapAttributes() {
+    return stringClassMapAttributes;
+  }
+
+  public void setStringClassMapAttributes(HashMap<String, Class> stringClassMapAttributes) {
+    this.stringClassMapAttributes = stringClassMapAttributes;
+  }
+
+  //----------------------------------------------------------------------------
+
 
   /**
    * Sets up the database drivers
@@ -380,12 +392,17 @@ public class myDB_InstanceQuery extends myDB_DatabaseUtils implements OptionHand
     Hashtable<String, Double>[] nominalIndexes = new Hashtable[numAttributes];
     @SuppressWarnings("unchecked")
     ArrayList<String>[] nominalStrings = new ArrayList[numAttributes];
+
+
+
     for (int i = 1; i <= numAttributes; i++) {
       /*
        * switch (md.getColumnType(i)) { case Types.CHAR: case Types.VARCHAR:
        * case Types.LONGVARCHAR: case Types.BINARY: case Types.VARBINARY: case
        * Types.LONGVARBINARY:
        */
+
+
 
       switch (adapter.translateDBColumnType(md.getColumnTypeName(i))) {
 
@@ -683,10 +700,32 @@ public class myDB_InstanceQuery extends myDB_DatabaseUtils implements OptionHand
     }
 
     Instances result = retrieveInstances(this, rs);
-    close(rs);
 
+
+    setStringClassMapAttributes(getAttributesClasses(rs, result));
+    close(rs);
     return result;
   }
+
+  //-----------------------------------------------------------------
+
+  public HashMap<String, Class> getAttributesClasses(ResultSet rs, Instances instances) throws Exception {
+
+
+    HashMap<String, Class> stringClassMapAttributes = new HashMap<>();
+    System.out.println(instances.toSummaryString());
+    System.out.println(instances.numAttributes());
+    System.out.println(rs.getMetaData());
+    for (int i = 1; i < instances.numAttributes(); i++) {
+
+      stringClassMapAttributes.put(instances.attribute(i).name(), rs.getMetaData().getColumnClassName(i).getClass());
+    }
+
+    return stringClassMapAttributes;
+  }
+
+  //-----------------------------------------------------------------
+
 
   /**
    * Test the class from the command line. The instance query should be

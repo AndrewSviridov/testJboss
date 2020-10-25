@@ -59,7 +59,7 @@ public class NewClassExample {
                 .newInstance("Get My Field");
         System.out.println(obj);
 
-        Method getMyField = newClass.getDeclaredMethod("getMyField", null);
+        Method getMyField = newClass.getDeclaredMethod("getMyField", String.class);
         System.out.println((String) getMyField.invoke(obj));
 
         Method setMyField = newClass.getDeclaredMethod("setMyField", String.class);
