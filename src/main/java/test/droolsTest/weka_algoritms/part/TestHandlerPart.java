@@ -1,19 +1,17 @@
-package test.droolsTest.weka_algoritms.JRIP;
+package test.droolsTest.weka_algoritms.part;
 
 import DAO.C3POData;
 import javafx.util.Pair;
 import rule.KnowledgeBaseWeka;
 import test.droolsTest.droolsUtils.DroolsHelper;
-import test.droolsTest.weka_algoritms.part.HandlerPart;
+import test.droolsTest.weka_algoritms.JRIP.HandlerJRIP;
 import weka.core.Attribute;
 import weka.core.Instances;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.HashMap;
 
-public class TestHandlerJRIP {
+public class TestHandlerPart {
 
     public static void main(String[] args) throws Exception {
         Connection conn = C3POData.getDataSource().getConnection();

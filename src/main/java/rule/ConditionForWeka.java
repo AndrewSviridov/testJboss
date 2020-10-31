@@ -2,14 +2,40 @@ package rule;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class ConditionForWeka {
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ConditionForWeka that = (ConditionForWeka) o;
+        return Objects.equals(field, that.field) &&
+                Objects.equals(value, that.value) &&
+                operator == that.operator &&
+                Objects.equals(typeClass, that.typeClass) &&
+                Objects.equals(level, that.level);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(field, value, operator, typeClass, level);
+    }
 
     private String field;
     private String value;
     private ConditionForWeka.Operator operator;
     private String typeClass;
+    private Integer level;
+
+    public Integer getLevel() {
+        return level;
+    }
+
+    public void setLevel(Integer level) {
+        this.level = level;
+    }
 
     public String getTypeClass() {
         return typeClass;

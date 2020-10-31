@@ -1,3 +1,4 @@
+import DAO.C3POData;
 import myDBWeka.myDB_InstanceQuery;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFFont;
@@ -300,7 +301,7 @@ public class TestMyRulesESCreateObjectWithoutArifmetic {
                 KieSession kSession = kc.getKieBase("rules").newKieSession();
 
                 // Set up listeners.
-                kSession.addEventListener(new DebugAgendaEventListener());
+                //       kSession.addEventListener(new DebugAgendaEventListener());
                 kSession.addEventListener(new DebugRuleRuntimeEventListener());
 
 // Set up a file-based audit logger.
@@ -312,7 +313,7 @@ public class TestMyRulesESCreateObjectWithoutArifmetic {
                 //-----------------------------------------------------------------------------------
 
                 // setup the debug listeners
-                kSession.addEventListener(new DebugAgendaEventListener());
+                //   kSession.addEventListener(new DebugAgendaEventListener());
                 //  kSession.addEventListener( new DebugWorkingMemoryEventListener() );
 // setup the audit logging
                 KieRuntimeLogger logger = KnowledgeRuntimeLoggerFactory.newFileLogger(kSession, "src/main/resources/log/TestMyRulesESCreateObjectWithoutArifmeticLog");

@@ -10,7 +10,7 @@
  *
  */
 
-package test.src;
+package test.wekaExample;
 //import required classes
 
 import weka.experiment.Stats;

@@ -10,13 +10,12 @@
  *
  */
 
-package test.src;
+package test.wekaExample;
 //import required classes
 
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
-import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.functions.SMOreg;
 
 public class ClassifyInstance {

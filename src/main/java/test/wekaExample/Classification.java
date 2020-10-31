@@ -1,4 +1,4 @@
-package test.src;/*
+package test.wekaExample;/*
  *  How to use WEKA API in Java
  *  Copyright (C) 2014
  *  @author Dr Noureddin M. Sadawi (noureddin.sadawi@gmail.com)

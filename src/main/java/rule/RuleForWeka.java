@@ -1,6 +1,7 @@
 package rule;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class RuleForWeka {
     private ArrayList<ConditionForWeka> list;
@@ -34,5 +35,25 @@ public class RuleForWeka {
 
     public void setInfo(String info) {
         this.info = info;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RuleForWeka that = (RuleForWeka) o;
+        return Objects.equals(list, that.list) &&
+                Objects.equals(thenPart, that.thenPart) &&
+                Objects.equals(info, that.info);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(list, thenPart, info);
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }

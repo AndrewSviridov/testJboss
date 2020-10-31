@@ -1,8 +1,8 @@
+import DAO.C3POData;
 import myDBWeka.myDB_InstanceQuery;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
-import org.kie.api.builder.Message;
 import org.kie.api.builder.model.KieModuleModel;
 import org.kie.api.definition.type.FactField;
 import org.kie.api.definition.type.FactType;
@@ -23,13 +23,10 @@ import weka.core.Attribute;
 import weka.core.Instances;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class TestMyRulesESCreateObject {

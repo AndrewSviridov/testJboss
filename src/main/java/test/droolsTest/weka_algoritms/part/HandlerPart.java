@@ -20,6 +20,10 @@ public class HandlerPart {
         this.KB = new KnowledgeBaseWeka();
     }
 
+    public void setOption(String[] option) throws Exception {
+        this.part.setOptions(option);
+    }
+
     public KnowledgeBaseWeka getRules(Instances dataset) throws Exception {
 
         part.setDebug(true);

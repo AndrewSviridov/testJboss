@@ -1,19 +1,16 @@
-package test.droolsTest.weka_algoritms.JRIP;
+package test.droolsTest.weka_algoritms.J48;
 
 import DAO.C3POData;
 import javafx.util.Pair;
 import rule.KnowledgeBaseWeka;
 import test.droolsTest.droolsUtils.DroolsHelper;
-import test.droolsTest.weka_algoritms.part.HandlerPart;
 import weka.core.Attribute;
 import weka.core.Instances;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.HashMap;
 
-public class TestHandlerJRIP {
+public class TestHandlerJ48 {
 
     public static void main(String[] args) throws Exception {
         Connection conn = C3POData.getDataSource().getConnection();
@@ -21,7 +18,7 @@ public class TestHandlerJRIP {
         String[] arr = {"public.view03", "record_id", "namefields", "fieldvalue", "type_collum"};
         String path = "C:\\Users\\Andrew\\wekafiles\\props\\postgres\\DatabaseUtils.props";
         Pair<Instances, HashMap<String, Class>> pair = DroolsHelper.getInstancesFromDB(conn, arr, path);
-        //HashMap<String, Class> stringClassMapAttributes= DroolsHelper.
+
 
         //       System.out.println(instances.toSummaryString());
         //System.out.println(data);
@@ -37,8 +34,8 @@ public class TestHandlerJRIP {
     }
 
     public static void test1(Pair<Instances, HashMap<String, Class>> data) throws Exception {
-        HandlerJRIP handlerJRIP = new HandlerJRIP();
-        KnowledgeBaseWeka knowledgeBaseWeka = handlerJRIP.getRules(data);
+        HandlerJ48 handlerJ48 = new HandlerJ48();
+        KnowledgeBaseWeka knowledgeBaseWeka = handlerJ48.getRules(data);
         System.out.println();
     }
 

@@ -9,7 +9,7 @@
  *  and my YouTube Channel!
  *
  */
-package test.src;
+package test.wekaExample;
 //import required classes
 
 import weka.core.Instances;

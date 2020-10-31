@@ -3,6 +3,7 @@ package test.droolsTest.weka_algoritms.part;
 import rule.ConditionForWeka;
 import rule.KnowledgeBaseWeka;
 import rule.RuleForWeka;
+import weka.classifiers.Evaluation;
 import weka.classifiers.rules.PART;
 import weka.core.Attribute;
 import weka.core.Instances;
@@ -10,6 +11,7 @@ import weka.core.Instances;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class HandlerPartCreateObject {
     private final PART part;
@@ -24,6 +26,27 @@ public class HandlerPartCreateObject {
 
         part.setDebug(true);
         part.buildClassifier(dataset);
+/*
+        System.out.println( part.toString());
+        String classifierRules = null;
+        try {
+
+
+            double percentageCorrect = 0;
+            Evaluation eval = new Evaluation(dataset);
+            eval.crossValidateModel(part, dataset, 10, new Random(1));
+          //  if (eval.pctCorrect() > percentageCorrect) {
+                percentageCorrect = eval.pctCorrect();
+                classifierRules = part.toString();
+            //}
+            System.out.println("Percentage of correctly classified instances for PART classifier: "+eval.pctCorrect());
+            //System.out.println(treePART.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+        System.out.println( part.toString());
+*/
         String par = part.toString();
         String[] arr = par.split("\n\n");
         List<String> itemList = new ArrayList<String>(Arrays.asList(arr));

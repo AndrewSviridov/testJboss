@@ -10,7 +10,7 @@
  *
  */
 
-package test.src;
+package test.wekaExample;
 //import classes
 
 import weka.core.Instances;
