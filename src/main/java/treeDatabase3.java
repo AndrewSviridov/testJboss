@@ -171,7 +171,7 @@ public class treeDatabase3 {
             data.setClassIndex(attrClass.index());
 
             HandlerPart handlerPart = new HandlerPart();
-            KnowledgeBaseWeka knowledgeBaseWeka = handlerPart.getRules(data);
+            KnowledgeBaseWeka knowledgeBaseWeka = handlerPart.getRulesOld(data);
 
 
             //---------------------------------------------------- создание правил

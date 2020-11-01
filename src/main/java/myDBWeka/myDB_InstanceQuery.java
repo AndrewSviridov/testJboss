@@ -22,12 +22,11 @@
 package myDBWeka;
 
 import java.io.File;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.Time;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.*;
+import java.util.Date;
 
+import test.droolsTest.droolsUtils.DroolsHelper;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
@@ -115,15 +114,16 @@ public class myDB_InstanceQuery extends myDB_DatabaseUtils implements OptionHand
 
   //----------------------------------------------------------------------------
   //
-  protected HashMap<String, Class> stringClassMapAttributes = null;
+  protected HashMap<String, String> stringClassMapAttributes = null;
 
-  public HashMap<String, Class> getStringClassMapAttributes() {
+  public HashMap<String, String> getStringClassMapAttributes() {
     return stringClassMapAttributes;
   }
 
-  public void setStringClassMapAttributes(HashMap<String, Class> stringClassMapAttributes) {
+  public void setStringClassMapAttributes(HashMap<String, String> stringClassMapAttributes) {
     this.stringClassMapAttributes = stringClassMapAttributes;
   }
+
 
   //----------------------------------------------------------------------------
 
@@ -709,19 +709,78 @@ public class myDB_InstanceQuery extends myDB_DatabaseUtils implements OptionHand
 
   //-----------------------------------------------------------------
 
-  public HashMap<String, Class> getAttributesClasses(ResultSet rs, Instances instances) throws Exception {
-
-
-    HashMap<String, Class> stringClassMapAttributes = new HashMap<>();
-    System.out.println(instances.toSummaryString());
-    System.out.println(instances.numAttributes());
-    System.out.println(rs.getMetaData());
-    for (int i = 1; i < instances.numAttributes(); i++) {
-
-      stringClassMapAttributes.put(instances.attribute(i).name(), rs.getMetaData().getColumnClassName(i).getClass());
+  public HashMap<String, String> getAttributesClasses(ResultSet rs, Instances instances) throws Exception {
+/*String ff="";
+    for (int i = 0; i < instances.numAttributes(); i++) {
+      ff=ff+"\n"+instances.attribute(i).name();
+    }
+*/
+    HashMap<String, String> stringClassMapAttributes = new HashMap<>();
+    //System.out.println(instances.toSummaryString());
+    //  System.out.println(instances.numAttributes());
+//    System.out.println(rs.getMetaData());
+    //int ererg = instances.numAttributes();
+    //int dfgf = rs.getMetaData().getColumnCount();
+    for (int i = 0; i < instances.numAttributes(); i++) {
+      // String gerg = rs.getMetaData().getColumnTypeName(i);
+      //   int dffdg = rs.getMetaData().getColumnCount();
+      // String fgdfff=rs.getMetaData().getColumnName(i);
+      //String fdgdf=instances.attribute(i).name();
+      for (int j = 1; j <= rs.getMetaData().getColumnCount(); j++) {
+        if (instances.attribute(i).name().equals(rs.getMetaData().getColumnName(j))) {
+          stringClassMapAttributes.put(instances.attribute(i).name(), DroolsHelper.readMetadata(rs.getMetaData().getColumnTypeName(j)));
+        }
+      }
     }
 
     return stringClassMapAttributes;
+  }
+
+  //Types[]
+  private String readMetadata(String type) {
+
+// сделал криво, как из файла анстроек примерное преобразование нашел. Сначала думал сделать по сайту
+    //https://www.cis.upenn.edu/~bcpierce/courses/629/jdkdocs/guide/jdbc/getstart/mapping.doc.html
+    switch (type.toLowerCase()) {
+      case "char":
+      case "varchar":
+      case "longvarchar":
+      case "text":
+        return "String";
+
+      case "numeric":
+      case "decimal":
+        return "java.math.BigDecimal";//
+
+      case "bit":
+        return "Boolean";
+
+      case "tinyint":
+      case "smallint":
+      case "integer":
+      case "int2":
+      case "int4":
+      case "oid":
+        return "Integer";
+
+      case "bigint":
+        return "Long";
+      case "real":
+      case "float4":
+        return "Float";
+
+
+      case "float":
+      case "float8":
+      case "double":
+      case "int8":
+        return "Double";
+      // todo сделать остальные типы
+      default:
+        return "String";
+    }
+
+
   }
 
   //-----------------------------------------------------------------

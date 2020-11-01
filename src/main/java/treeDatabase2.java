@@ -178,7 +178,7 @@ public class treeDatabase2 {
             data.setClassIndex(attrClass.index());
 
             HandlerPart handlerPart = new HandlerPart();
-            KnowledgeBaseWeka knowledgeBaseWeka = handlerPart.getRules(data);
+            KnowledgeBaseWeka knowledgeBaseWeka = handlerPart.getRulesOld(data);
 
 
             //---------------------------------------------------- создание правил
@@ -278,6 +278,7 @@ public class treeDatabase2 {
 
             System.out.println(stringBuilder.toString() + "\n\n");
 
+            String drlInMemeory = stringBuilder.toString();
 // работа с drools
 
 

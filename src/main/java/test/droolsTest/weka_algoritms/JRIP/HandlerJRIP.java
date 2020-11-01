@@ -4,6 +4,7 @@ import javafx.util.Pair;
 import rule.ConditionForWeka;
 import rule.KnowledgeBaseWeka;
 import rule.RuleForWeka;
+import test.droolsTest.weka_algoritms.IHandlerAlgorithm;
 import weka.classifiers.rules.JRip;
 import weka.classifiers.rules.*;
 import weka.core.Attribute;
@@ -11,6 +12,7 @@ import weka.core.FastVector;
 import weka.core.Instances;
 import weka.filters.unsupervised.attribute.SortLabels;
 
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,7 +20,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class HandlerJRIP {
+public class HandlerJRIP implements IHandlerAlgorithm {
     private final JRip jrip;
     private final KnowledgeBaseWeka KB;
 
@@ -77,7 +79,7 @@ public class HandlerJRIP {
     }
 
 
-    public KnowledgeBaseWeka getRules(Pair<Instances, HashMap<String, Class>> pair) throws Exception {
+    public KnowledgeBaseWeka getRules(Pair<Instances, HashMap<String, String>> pair) throws Exception {
 
         // System.out.println("!! getRules");
 
@@ -111,13 +113,13 @@ public class HandlerJRIP {
                     double value = ((JRip.NumericAntd) antd).getSplitPoint();
                     newCond.setValue(String.valueOf(value));
                     newCond.setOperator(ConditionForWeka.Operator.fromValue(symbol));
-                    newCond.setTypeClass(pair.getValue().get(antd.getAttr().name()).getSimpleName());
+                    newCond.setTypeClass(pair.getValue().get(antd.getAttr().name()));
                     //LHS.add(new Element(attrName, symbol, value));
                 } else if (antd instanceof JRip.NominalAntd) {
 
                     String value = antd.getAttr().value((int) antd.getAttrValue());
-                    newCond.setOperator(ConditionForWeka.Operator.fromValue("="));
-                    newCond.setTypeClass(pair.getValue().get(antd.getAttr().name()).getSimpleName());
+                    newCond.setOperator(ConditionForWeka.Operator.fromValue("=="));
+                    newCond.setTypeClass(pair.getValue().get(antd.getAttr().name()));
                     newCond.setValue(String.valueOf(value));
                     //LHS.add(new Element(attrName, Symbol.E, value));
                 }

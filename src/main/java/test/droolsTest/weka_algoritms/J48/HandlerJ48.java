@@ -4,17 +4,19 @@ import javafx.util.Pair;
 import rule.ConditionForWeka;
 import rule.KnowledgeBaseWeka;
 import rule.RuleForWeka;
+import test.droolsTest.weka_algoritms.IHandlerAlgorithm;
 import weka.classifiers.rules.JRip;
 import weka.classifiers.rules.Rule;
 import weka.classifiers.trees.J48;
 import weka.classifiers.trees.j48.ModelSelection;
 import weka.core.Instances;
 
+import java.sql.ResultSet;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class HandlerJ48 {
+public class HandlerJ48 implements IHandlerAlgorithm {
     private final J48 j48;
     private final KnowledgeBaseWeka KB;
 
@@ -90,7 +92,7 @@ public class HandlerJ48 {
     }
 
 
-    public KnowledgeBaseWeka getRules(Pair<Instances, HashMap<String, Class>> pair) throws Exception {
+    public KnowledgeBaseWeka getRules(Pair<Instances, HashMap<String, String>> pair) throws Exception {
 
         j48.setDebug(true);
         j48.buildClassifier(pair.getKey());
@@ -154,7 +156,7 @@ public class HandlerJ48 {
                                 newCond1.setField(part1[0].trim());
                                 newCond1.setValue(part1[1].trim());
                                 newCond1.setOperator(ConditionForWeka.Operator.fromValue(sign));
-                                newCond1.setTypeClass(pair.getValue().get(part1[0].trim()).getSimpleName());
+                                newCond1.setTypeClass(pair.getValue().get(part1[0].trim()));
                                 rule1.getList().add(newCond1);
                                 break;
                                 //KB.getRuleForWekaArrayList().get(KB.getRuleForWekaArrayList().size()-1).getList()
@@ -163,7 +165,7 @@ public class HandlerJ48 {
                                 newCond.setField(part1[0].trim());
                                 newCond.setValue(part1[1].trim());
                                 newCond.setOperator(ConditionForWeka.Operator.fromValue(sign));
-                                newCond.setTypeClass(pair.getValue().get(part1[0].trim()).getSimpleName());
+                                newCond.setTypeClass(pair.getValue().get(part1[0].trim()));
                                 break;
                             }
                         } else continue;
@@ -203,7 +205,7 @@ public class HandlerJ48 {
                             newCond.setField(part1[0].trim());
                             newCond.setValue(part1[1].trim());
                             newCond.setOperator(ConditionForWeka.Operator.fromValue(sign));
-                            newCond.setTypeClass(pair.getValue().get(part1[0].trim()).getSimpleName());
+                            newCond.setTypeClass(pair.getValue().get(part1[0].trim()));
                             break;
                         } else continue;
                     }
@@ -217,7 +219,7 @@ public class HandlerJ48 {
                         newCond.setField(part1[0].trim());
                         newCond.setValue(part1[1].trim());
                         newCond.setOperator(ConditionForWeka.Operator.fromValue(sign));
-                        newCond.setTypeClass(pair.getValue().get(part1[0].trim()).getSimpleName());
+                        newCond.setTypeClass(pair.getValue().get(part1[0].trim()));
                         break;
                     }
                     continue;
