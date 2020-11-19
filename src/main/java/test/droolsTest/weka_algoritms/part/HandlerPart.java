@@ -8,8 +8,6 @@ import test.droolsTest.weka_algoritms.IHandlerAlgorithm;
 import weka.classifiers.rules.PART;
 import weka.core.Instances;
 
-
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,6 +25,7 @@ public class HandlerPart implements IHandlerAlgorithm {
     public void setOption(String[] option) throws Exception {
         this.part.setOptions(option);
     }
+
 
     //todo разобраться c Exception-нами
     public KnowledgeBaseWeka getRules(Pair<Instances, HashMap<String, String>> pair) throws Exception {
@@ -139,4 +138,11 @@ public class HandlerPart implements IHandlerAlgorithm {
         return KB;
     }
 
+    public PART getPart() {
+        return part;
+    }
+
+    public KnowledgeBaseWeka getKB() {
+        return KB;
+    }
 }

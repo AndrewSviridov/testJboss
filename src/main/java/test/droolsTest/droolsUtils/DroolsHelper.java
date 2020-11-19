@@ -7,12 +7,27 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import rule.ConditionForWeka;
 import rule.KnowledgeBaseWeka;
+import rule.RuleForWeka;
+import test.droolsTest.ClassForGlobal;
+import test.droolsTest.ClassResultObject;
+import weka.classifiers.Classifier;
+import weka.classifiers.Evaluation;
+import weka.classifiers.evaluation.ThresholdCurve;
 import weka.core.Instances;
+import weka.core.Utils;
+import weka.core.converters.ArffSaver;
+import weka.gui.visualize.PlotData2D;
+import weka.gui.visualize.ThresholdVisualizePanel;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.sql.*;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.Types;
+import java.util.List;
 import java.util.*;
 
 public class DroolsHelper {
@@ -74,7 +89,7 @@ public class DroolsHelper {
                     "\n" +
                     "rule \"Rule_3\"\n" +
                     "    when\n" +
-                    "        _expassessment( _wallthickness<=15 && _typeusebath==\"круглогодичное\" ) \n" +
+                    "      $fact :  _expassessment( _wallthickness<=15 && _typeusebath==\"круглогодичное\" ) \n" +
                     "    then\n" +
                     "       list.add(new ClassForGlobal(\"7\",\"\",\"Rule_3\"));//баня холодная\n" +
                     // "       System.out.println(\"Rule_3\");" +
@@ -83,7 +98,7 @@ public class DroolsHelper {
                     "\n" +
                     "rule \"Rule_4\"\n" +
                     "    when\n" +
-                    "        _expassessment( _wallthickness==15 && _typeusebath==\"круглогодичное\" && _ceilinginsulation==\"true\" && _floorinsulation==\"false\") \n" +
+                    "     $fact :   _expassessment( _wallthickness==15 && _typeusebath==\"круглогодичное\" && _ceilinginsulation==\"true\" && _floorinsulation==\"false\") \n" +
                     "    then\n" +
                     "       list.add(new ClassForGlobal(\"2\",\"\",\"Rule_4\"));//нужно утеплить пол оценка +2\n" +
                     //   "       System.out.println(\"Rule_4\");" +
@@ -91,7 +106,7 @@ public class DroolsHelper {
                     "\n" +
                     "rule \"Rule_5\"\n" +
                     "    when\n" +
-                    "        _expassessment( _wallthickness>=20 && _typeusebath==\"круглогодичное\" && _ceilinginsulation==\"false\") \n" +
+                    "   $fact :     _expassessment( _wallthickness>=20 && _typeusebath==\"круглогодичное\" && _ceilinginsulation==\"false\") \n" +
                     "    then\n" +
                     "       list.add(new ClassForGlobal(\"3\",\"\",\"Rule_5\"));//нужно утеплить потолок оценка +3\n" +
                     //   "       System.out.println(\"Rule_5\");" +
@@ -448,5 +463,181 @@ public class DroolsHelper {
 
 
     }
+
+
+    public static String getStatisticSimple(Instances train, Instances test, Classifier cls) throws Exception {
+
+//The kappa statistic measures the agreement of
+//prediction with the true class –
+//1.0 signifies complete agreement.
+
+        //Статистика каппа измеряет согласие
+        //предсказание с истинным классом -
+        //1.0 означает полное согласие.
+//https://www.researchgate.net/post/can_i_do_kappa_statistics_metric_for_find_the_best_model_among_3_different_models
+//https://stackoverflow.com/questions/48720739/cohens-kappa-and-kappa-statistic-in-weka
+
+        Evaluation eval = new Evaluation(train);
+
+
+        //Notice we build the classifier with the training dataset
+        //we initialize evaluation with the training dataset and then
+        //evaluate using the test dataset
+
+        //test dataset for evaluation
+        //now evaluate model
+        //eval.evaluateModel(tree, testDataset);
+        eval.evaluateModel(cls, test);
+
+        StringBuilder str = new StringBuilder();
+    /*    System.out.println(eval.toSummaryString("Evaluation results:\n", false));
+
+        System.out.println("Correct % = " + eval.pctCorrect());
+        System.out.println("Incorrect % = " + eval.pctIncorrect());
+        System.out.println("AUC = " + eval.areaUnderROC(1));
+        System.out.println("kappa = " + eval.kappa());
+        System.out.println("MAE = " + eval.meanAbsoluteError());
+        System.out.println("RMSE = " + eval.rootMeanSquaredError());
+        System.out.println("RAE = " + eval.relativeAbsoluteError());
+        System.out.println("RRSE = " + eval.rootRelativeSquaredError());
+        System.out.println("Precision = " + eval.precision(1));
+        System.out.println("Recall = " + eval.recall(1));
+        System.out.println("fMeasure = " + eval.fMeasure(1));
+        System.out.println("Error Rate = " + eval.errorRate());
+        //the confusion matrix
+        System.out.println(eval.toMatrixString("=== Overall Confusion Matrix ===\n"));
+      */
+
+        str.append("Correct % = " + eval.pctCorrect() + "\n");
+        str.append("Incorrect % = " + eval.pctIncorrect() + "\n");
+        str.append("AUC = " + eval.areaUnderROC(1) + "\n");
+        str.append("kappa = " + eval.kappa() + "\n");
+        str.append("MAE = " + eval.meanAbsoluteError() + "\n");
+        str.append("RMSE = " + eval.rootMeanSquaredError() + "\n");
+        str.append("RAE = " + eval.relativeAbsoluteError() + "\n");
+        str.append("RRSE = " + eval.rootRelativeSquaredError() + "\n");
+        str.append("Precision = " + eval.precision(1) + "\n");
+        str.append("Recall = " + eval.recall(1) + "\n");
+        str.append("fMeasure = " + eval.fMeasure(1) + "\n");
+        str.append("Error Rate = " + eval.errorRate() + "\n");
+        str.append(eval.toMatrixString("=== Overall Confusion Matrix ===\n"));
+        str.append(eval.toSummaryString() + "\n");
+        return str.toString();
+
+    }
+
+
+    public static Pair<Instances, Instances> splitInstances(Instances data, double splitNumber) {
+
+        Instances partLow = new Instances(data);
+        Instances partHight = new Instances(data);
+
+        for (int i = 0; i < partLow.numInstances(); i++) {
+            if (partLow.instance(i).classValue() <= splitNumber) {
+                partLow.remove(i);
+            }
+        }
+
+        for (int i = 0; i < partHight.numInstances(); i++) {
+            if (partHight.instance(i).classValue() >= splitNumber) {
+                partHight.remove(i);
+            }
+        }
+
+
+        Pair<Instances, Instances> pair = new Pair<>(partLow, partHight);
+        return pair;
+    }
+
+    // делим делим правила по пороговому значению
+    public static Pair<List<RuleForWeka>, List<RuleForWeka>> splitPorogGreneratedRules(KnowledgeBaseWeka KB, double splitNumber) {
+
+        ArrayList<RuleForWeka> listLow = new ArrayList<>();
+        ArrayList<RuleForWeka> listHigh = new ArrayList<>();
+
+        for (RuleForWeka it : KB.getRuleForWekaArrayList()) {
+            if (Double.parseDouble(it.getThenPart()) <= splitNumber) {
+                listLow.add(it);
+            } else {
+                listHigh.add(it);
+            }
+        }
+
+        return new Pair(listLow, listHigh);
+    }
+
+
+    // делим на правила которые меньше всего повлияли на оценку факта ошибку
+    public static Pair<List<ClassForGlobal>, List<ClassForGlobal>> getLowAndHighRule(ClassResultObject resultObject) {
+        List<ClassForGlobal> listLow = new ArrayList<>(resultObject.getOutputGlobalList());
+        List<ClassForGlobal> listHigh = new ArrayList<>();
+
+        for (ClassForGlobal it : listLow) {
+            if (Double.parseDouble(it.getThenPart()) <= resultObject.getAssessment()) {
+                listLow.remove(it);
+            } else {
+                listHigh.add(it);
+            }
+        }
+
+        return new Pair(listLow, listHigh);
+    }
+
+
+    public static void saveToARFF(Instances data, String path) {
+        try {
+            ArffSaver saver = new ArffSaver();
+            saver.setInstances(data);//set the dataset we want to convert
+            //and save as ARFF
+            saver.setFile(new File(path));
+            saver.writeBatch();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+
+        }
+    }
+
+    public static void getROC(Instances ttain, Instances test, Classifier cl, Integer indexAttr) throws Exception {
+        // load data
+        // Instances data = ConverterUtils.DataSource.read(args[0]);
+        // data.setClassIndex(data.numAttributes() - 1);
+
+        // evaluate classifier
+        // Classifier cl = new NaiveBayes();
+        Evaluation eval = new Evaluation(ttain);
+        // eval.crossValidateModel(cl, data, 10, new Random(1));
+        eval.evaluateModel(cl, test);
+        // generate curve
+        ThresholdCurve tc = new ThresholdCurve();
+        int classIndex = indexAttr;
+        Instances curve = tc.getCurve(eval.predictions(), classIndex);
+
+        // plot curve
+        ThresholdVisualizePanel tvp = new ThresholdVisualizePanel();
+        tvp.setROCString("(Area under ROC = " +
+                Utils.doubleToString(ThresholdCurve.getROCArea(curve), 4) + ")");
+        tvp.setName(curve.relationName());
+        PlotData2D plotdata = new PlotData2D(curve);
+        plotdata.setPlotName(curve.relationName());
+        plotdata.addInstanceNumberAttribute();
+        // specify which points are connected
+        boolean[] cp = new boolean[curve.numInstances()];
+        for (int n = 1; n < cp.length; n++)
+            cp[n] = true;
+        plotdata.setConnectPoints(cp);
+        // add plot
+        tvp.addPlot(plotdata);
+
+        // display curve
+        final JFrame jf = new JFrame("WEKA ROC: " + tvp.getName());
+        jf.setSize(500, 400);
+        jf.getContentPane().setLayout(new BorderLayout());
+        jf.getContentPane().add(tvp, BorderLayout.CENTER);
+        jf.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        jf.setVisible(true);
+    }
+
 
 }

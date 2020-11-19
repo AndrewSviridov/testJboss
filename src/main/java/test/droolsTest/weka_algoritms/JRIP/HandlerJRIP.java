@@ -6,13 +6,11 @@ import rule.KnowledgeBaseWeka;
 import rule.RuleForWeka;
 import test.droolsTest.weka_algoritms.IHandlerAlgorithm;
 import weka.classifiers.rules.JRip;
-import weka.classifiers.rules.*;
+import weka.classifiers.rules.Rule;
+import weka.classifiers.rules.RuleStats;
 import weka.core.Attribute;
-import weka.core.FastVector;
 import weka.core.Instances;
-import weka.filters.unsupervised.attribute.SortLabels;
 
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -295,5 +293,11 @@ public class HandlerJRIP implements IHandlerAlgorithm {
         return null;
     }
 
+    public JRip getJrip() {
+        return jrip;
+    }
 
+    public KnowledgeBaseWeka getKB() {
+        return KB;
+    }
 }

@@ -4,13 +4,23 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class RuleForWeka {
+    private String nameRule = null;
     private ArrayList<ConditionForWeka> list;
     private String thenPart = "";
     private String info = "";
 
+    //todo добавить ruleName в констурктор может
     public RuleForWeka() {
         this.list = new ArrayList<>();
 
+    }
+
+    public String getNameRule() {
+        return nameRule;
+    }
+
+    public void setNameRule(String nameRule) {
+        this.nameRule = nameRule;
     }
 
     public ArrayList<ConditionForWeka> getList() {

@@ -13,14 +13,12 @@ public class ConditionForWeka {
         ConditionForWeka that = (ConditionForWeka) o;
         return Objects.equals(field, that.field) &&
                 Objects.equals(value, that.value) &&
-                operator == that.operator &&
-                Objects.equals(typeClass, that.typeClass) &&
-                Objects.equals(level, that.level);
+                operator == that.operator;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(field, value, operator, typeClass, level);
+        return Objects.hash(field, value, operator, typeClass);
     }
 
     private String field;
